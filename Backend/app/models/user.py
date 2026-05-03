@@ -13,7 +13,7 @@ class User(Base):
 
     __mapper_args__ = {
         "polymorphic_on": role,
-        "polymorphic_identity": "user",
+        "polymorphic_identity": "USER",
     }
 
 class Mahasiswa(User):
@@ -26,7 +26,7 @@ class Mahasiswa(User):
     daftar_pengajuan = relationship("Pengajuan", back_populates="pembuat")
 
     __mapper_args__ = {
-        "polymorphic_identity": "mahasiswa",
+        "polymorphic_identity": "MAHASISWA",
     }
 
 class Dosen(User):
@@ -39,5 +39,5 @@ class Dosen(User):
     tugas_validasi = relationship("Pengajuan", back_populates="validator")
 
     __mapper_args__ = {
-        "polymorphic_identity": "dosen",
+        "polymorphic_identity": "DOSEN",
     }

@@ -1,0 +1,10 @@
+from sqlalchemy.orm import Session
+from app.models.user import User
+from typing import Optional
+
+class UserRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_user_by_email(self, email:str) -> Optional[User] :
+        return self.db.query(User).filter(User.email == email).first()
