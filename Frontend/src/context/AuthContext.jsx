@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { dummyUser } from '../data/dummy';
 
 const AuthContext = createContext(null);
@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const login = (email, password) => {
+  const login = async (email, password) => {
     try{
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: 'POST',
@@ -43,7 +43,8 @@ export function AuthProvider({ children }) {
     //   return { success: true, role: 'dosen' };
     // }
     // return { success: false };
-  };
+  }
+};
 
   const logout = () => {
     setUser(null);

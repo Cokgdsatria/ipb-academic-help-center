@@ -5,20 +5,27 @@ import { useAuth } from '../context/AuthContext';
 import IPBLogo from '../components/IPBLogo';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const result = login(username, password);
+    setError('');
+
+    const result = await login(email, password);
     if (result.success) {
-      navigate(result.role === 'dosen' ? '/dosen/beranda' : '/beranda');
+      // navigate(result.role === 'dosen' ? '/dosen/beranda' : '/beranda');
+      if (result.role === 'DOSEN') {
+        navigate('/beranda-dosen');
+      } else {
+        navigate('/beranda-mahasiswa');
+      }
     } else {
-      setError('Username atau password salah. Coba: mahasiswa/mahasiswa123 atau dosen/dosen123');
+      setError('Email atau password salah. Pastikan data sudah sesuai di database.');
     }
   };
 
@@ -102,9 +109,9 @@ export default function LoginPage() {
               <div className="relative">
                 <input
                   type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Masukkan username"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Masukkan email"
                   className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <User size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />

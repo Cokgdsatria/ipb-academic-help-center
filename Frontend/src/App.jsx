@@ -11,20 +11,25 @@ import PengajuanDosen from './pages/PengajuanDosen';
 function ProtectedRoute({ children, requiredRole }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
-  if (requiredRole && user.role !== requiredRole) {
-    return <Navigate to={user.role === 'dosen' ? '/dosen/beranda' : '/beranda'} replace />;
+  // if (requiredRole && user.role !== requiredRole) {
+  //   return <Navigate to={user.role === 'dosen' ? '/dosen/beranda' : '/beranda'} replace />;
+  // }
+  if (requiredRole && user.role.toUpperCase() !== requiredRole.toUpperCase()) {
+    return <Navigate to={user.role.toUpperCase() === 'DOSEN' ? '/dosen/beranda' : '/beranda'} replace />;
   }
   return children;
 }
 
 function AppRoutes() {
   const { user } = useAuth();
+
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+
       <Route path="/" element={
         user
-          ? <Navigate to={user.role === 'dosen' ? '/dosen/beranda' : '/beranda'} replace />
+          ? <Navigate to={user.role.toUpperCase() === 'DOSEN' ? '/dosen/beranda' : '/beranda'} replace />
           : <Navigate to="/login" replace />
       } />
 
@@ -33,21 +38,21 @@ function AppRoutes() {
         <ProtectedRoute requiredRole="mahasiswa"><BerandaMahasiswa /></ProtectedRoute>
       } />
       <Route path="/tiket/baru" element={
-        <ProtectedRoute requiredRole="mahasiswa"><BukaTiketBaru /></ProtectedRoute>
+        <ProtectedRoute requiredRole="MAHASISWA"><BukaTiketBaru /></ProtectedRoute>
       } />
       <Route path="/tiket" element={
-        <ProtectedRoute requiredRole="mahasiswa"><TiketPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="MAHASISWA"><TiketPage /></ProtectedRoute>
       } />
       <Route path="/tiket/:id" element={
-        <ProtectedRoute requiredRole="mahasiswa"><DetailTiket /></ProtectedRoute>
+        <ProtectedRoute requiredRole="MAHASISWA"><DetailTiket /></ProtectedRoute>
       } />
 
       {/* Dosen */}
       <Route path="/dosen/beranda" element={
-        <ProtectedRoute requiredRole="dosen"><BerandaDosen /></ProtectedRoute>
+        <ProtectedRoute requiredRole="DOSEN"><BerandaDosen /></ProtectedRoute>
       } />
       <Route path="/dosen/pengajuan" element={
-        <ProtectedRoute requiredRole="dosen"><PengajuanDosen /></ProtectedRoute>
+        <ProtectedRoute requiredRole="DOSEN"><PengajuanDosen /></ProtectedRoute>
       } />
 
       <Route path="*" element={<Navigate to="/" replace />} />

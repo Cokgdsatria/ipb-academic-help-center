@@ -1,0 +1,28 @@
+*   [33md3d7823[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/backend-dev[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mbackend-dev[m[33m)[m Merge pull request #5 from Cokgdsatria/frontendbeta
+[31m|[m[32m\[m  
+[31m|[m * [33m81a84f6[m[33m ([m[1;31morigin/frontendbeta[m[33m)[m tes
+[31m|[m * [33m04c6205[m gg
+* [32m|[m [33meb36342[m Delete Frontend/tes
+* [32m|[m [33m39f9373[m Merge pull request #4 from Cokgdsatria/frontendbeta
+[33m|[m[32m\[m[32m|[m 
+[33m|[m * [33m4ae983d[m tes
+[33m|[m * [33m358a447[m tes
+[33m|[m * [33mccd44b4[m tes
+[33m|[m * [33m4683c8d[m tes
+* [34m|[m [33m93b9c68[m Merge pull request #3 from Cokgdsatria/frontendbeta
+[35m|[m[34m\[m[34m|[m 
+[35m|[m * [33m0bb9f4b[m balikin warna awal
+[35m|[m * [33m68c1782[m delete file ga penting
+[35m|[m * [33m5e2476b[m testing
+[35m|[m * [33m72ecd74[m gajadi
+[35m|[m * [33m8b6c0c8[m nyoba
+[35m|[m[35m/[m  
+* [33md38c719[m[33m ([m[1;31morigin/frontend1[m[33m)[m testing frontend #1 (hasil prompt AI)
+* [33m4e9af74[m Create test
+* [33mca384bc[m Delete Frontend/tsconfig.json
+* [33m8b825db[m Delete Frontend/package.json
+* [33m4739154[m Delete Frontend/src directory
+* [33maed6893[m[33m ([m[1;31morigin/frontend-login[m[33m)[m Struktur komponen frontend IPB Academic Helper
+* [33m70d9a4e[m Create css
+* [33mfeea9e7[m Create Database
+* [33mcae3251[m Initial commit
