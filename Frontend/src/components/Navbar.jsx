@@ -24,7 +24,9 @@ export default function Navbar({ role = 'mahasiswa' }) {
     { label: 'Buka Tiket Pengajuan', to: '/dosen/pengajuan' },
   ];
 
-  const links = role === 'dosen' ? dosenLinks : mahasiswaLinks;
+  // const links = role === 'dosen' ? dosenLinks : mahasiswaLinks;
+  const userRole = user?.role?.toUpperCase();
+  const links = userRole === 'DOSEN' ? dosenLinks : mahasiswaLinks;
 
   return (
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-40 shadow-sm">
