@@ -73,4 +73,3 @@ VITE_API_URL=http://127.0.0.1:8000/api/v1
 - Backend menggunakan FastAPI dan CORS sudah diaktifkan untuk `localhost:5173`.
 - Token login disimpan di `localStorage` oleh frontend.
 - Dokumentasi frontend yang lebih lengkap ada di [Frontend/README.md](Frontend/README.md).
-
