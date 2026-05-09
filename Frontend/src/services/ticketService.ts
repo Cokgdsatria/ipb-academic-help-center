@@ -22,6 +22,7 @@ export interface TicketRequest {
 
 export interface TicketResponse {
     id: number;
+    topik?: string;
     subjek: string;
     status: 'PENDING' | 'RESOLVED' | 'REJECTED';
     deskripsi?: string;

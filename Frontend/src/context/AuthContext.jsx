@@ -25,9 +25,12 @@ export function AuthProvider({ children }) {
 
       const data = await response.json();
 
-      setUser(data);
-      localStorage.setItem('user', JSON.stringify(data));
+      // Simpan access token agar request endpoint protected tidak 401
+      localStorage.setItem('token', data.access_token);
 
+      const userData = { nama: data.nama, role: data.role, email };
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
       return { success: true, role: data.role };
     } catch (error) {
 
@@ -49,6 +52,7 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (

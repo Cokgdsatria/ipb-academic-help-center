@@ -12,10 +12,38 @@ from app.schemas.ticket import (
 )
 
 from app.repositories.ticket import TicketRepository
+from app.models.user import User, Dosen
 
 from app.api.v1.deps import get_current_user
 
 router = APIRouter()
+
+# Schemas for responses
+from pydantic import BaseModel
+
+class JenisPengajuan(BaseModel):
+    id: int
+    nama_jenis: str
+
+class DosenResponse(BaseModel):
+    id_user: int
+    nama: str
+
+# ENDPOINT: AMBIL DAFTAR JENIS PENGAJUAN (TOPIK)
+@router.get("/types", response_model=List[JenisPengajuan])
+def get_ticket_types(db: Session = Depends(get_db)):
+    # Return hardcoded types sesuai dengan yang digunakan di frontend
+    return [
+        {"id": 1, "nama_jenis": "Pengajuan Surat"},
+        {"id": 2, "nama_jenis": "Pengajuan Bimbingan"},
+        {"id": 3, "nama_jenis": "Pengajuan Akademik"},
+    ]
+
+# ENDPOINT: AMBIL DAFTAR DOSEN
+@router.get("/lecturers", response_model=List[DosenResponse])
+def get_lecturers(db: Session = Depends(get_db)):
+    lecturers = db.query(User).filter(User.role == "DOSEN").all()
+    return [{"id_user": l.id_user, "nama": l.nama} for l in lecturers]
 
 # ENDPOINT: BUAT TIKET BARU 
 @router.post("/", response_model=TicketResponse, status_code=status.HTTP_201_CREATED)
@@ -24,6 +52,17 @@ def create_new_ticket(
     db: Session = Depends(get_db),
     current_user: any = Depends(get_current_user)
 ):
+    is_bimbingan_topic = ticket_in.id_jenis_pengajuan == 2
+
+    if is_bimbingan_topic and not ticket_in.tanggal_bimbingan:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Tanggal bimbingan wajib diisi untuk topik Pengajuan Bimbingan."
+        )
+
+    if not is_bimbingan_topic:
+        ticket_in.tanggal_bimbingan = None
+
     return TicketRepository.create_ticket(
         db=db,
         ticket_data=ticket_in,

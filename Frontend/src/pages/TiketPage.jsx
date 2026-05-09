@@ -1,22 +1,85 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, RefreshCw, Plus, ChevronDown } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Badge from '../components/Badge';
-import { dummyTickets } from '../data/dummy';
+import { ticketService } from '../services/ticketService';
 
 export default function TiketPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('Semua Status');
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const filtered = dummyTickets.filter((t) => {
-    const matchSearch =
-      t.id.toLowerCase().includes(search.toLowerCase()) ||
-      t.topik.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === 'Semua Status' || t.status === statusFilter;
-    return matchSearch && matchStatus;
-  });
+  const topikMap = {
+    '1': 'Pengajuan Surat',
+    '2': 'Pengajuan Bimbingan',
+    '3': 'Pengajuan Akademik',
+  };
+
+  const statusMap = {
+    PENDING: 'Menunggu',
+    RESOLVED: 'Selesai',
+    REJECTED: 'Ditolak',
+  };
+
+  const formatDateTime = (isoString) => {
+    try {
+      const dt = new Date(isoString);
+      return dt.toLocaleString('id-ID', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return '-';
+    }
+  };
+
+  const loadTickets = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const data = await ticketService.getMyTickets();
+      setTickets(data);
+    } catch (err) {
+      setError(err?.response?.data?.detail || 'Gagal memuat riwayat tiket.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTickets();
+  }, []);
+
+  const filtered = useMemo(() => {
+    const normalized = tickets.map((t) => {
+      const topikLabel = topikMap[String(t.topik)] || t.topik || '-';
+      const statusLabel = statusMap[t.status] || t.status;
+      const ticketIdLabel = `#${t.id}`;
+      return {
+        ...t,
+        idLabel: ticketIdLabel,
+        topikLabel,
+        statusLabel,
+        tanggalLabel: formatDateTime(t.created_at),
+      };
+    });
+
+    return normalized.filter((t) => {
+      const matchSearch =
+        t.idLabel.toLowerCase().includes(search.toLowerCase()) ||
+        t.topikLabel.toLowerCase().includes(search.toLowerCase()) ||
+        (t.subjek || '').toLowerCase().includes(search.toLowerCase());
+      const matchStatus = statusFilter === 'Semua Status' || t.statusLabel === statusFilter;
+      return matchSearch && matchStatus;
+    });
+  }, [tickets, search, statusFilter]);
 
   const statusOptions = ['Semua Status', 'Menunggu', 'Diproses', 'Selesai', 'Ditolak'];
 
@@ -53,8 +116,13 @@ export default function TiketPage() {
         {/* Toolbar */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">Terakhir diperbarui: 13:45</span>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 bg-white transition-colors">
+            <span className="text-sm text-gray-500">
+              {loading ? 'Memuat...' : `Total tiket: ${tickets.length}`}
+            </span>
+            <button
+              onClick={loadTickets}
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 bg-white transition-colors"
+            >
               <RefreshCw size={14} />
               Refresh
             </button>
@@ -86,17 +154,17 @@ export default function TiketPage() {
                 <tr key={ticket.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4 text-sm text-gray-600">{index + 1}</td>
                   <td className="px-6 py-4 text-sm font-semibold text-blue-600 cursor-pointer hover:underline"
-                    onClick={() => navigate(`/tiket/${ticket.id.replace('#', '')}`)}>
-                    {ticket.id}
+                    onClick={() => navigate(`/tiket/${ticket.id}`)}>
+                    {ticket.idLabel}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">{ticket.topik}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{ticket.tanggal}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{ticket.topikLabel}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{ticket.tanggalLabel}</td>
                   <td className="px-6 py-4">
-                    <Badge status={ticket.status} />
+                    <Badge status={ticket.statusLabel} />
                   </td>
                   <td className="px-6 py-4">
                     <button
-                      onClick={() => navigate(`/tiket/${ticket.id.replace('#', '')}`)}
+                      onClick={() => navigate(`/tiket/${ticket.id}`)}
                       className="px-4 py-1.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       Lihat
@@ -104,7 +172,14 @@ export default function TiketPage() {
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && (
+              {!loading && error && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-6 text-center text-sm text-red-500">
+                    {error}
+                  </td>
+                </tr>
+              )}
+              {!loading && !error && filtered.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-400">
                     Tidak ada tiket ditemukan.
