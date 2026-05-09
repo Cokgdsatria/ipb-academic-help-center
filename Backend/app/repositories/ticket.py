@@ -28,14 +28,16 @@ class TicketRepository:
         return db.query(Ticket).filter(Ticket.mahasiswa_id == user_id).order_by(Ticket.created_at.desc()).all()
     
     @staticmethod
-    def get_dashboard_stats(db: Session, user_id: str):
-        
-        total = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id).count()
+    def get_dashboard_stats(db: Session, user_id: str, role: str):
+        if role == "DOSEN":
+            base_query = db.query(Ticket).filter(Ticket.dosen_id == user_id)
+        else:
+            base_query = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id)
 
-        #Berdasarkan status
-        pending = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id, Ticket.status == "PENDING").count()
-        completed = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id, Ticket.status == "RESOLVED").count()
-        rejected = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id, Ticket.status == "REJECTED").count()
+        total = base_query.count()
+        pending = base_query.filter(Ticket.status == "PENDING").count()
+        completed = base_query.filter(Ticket.status == "RESOLVED").count()
+        rejected = base_query.filter(Ticket.status == "REJECTED").count()
 
         return {
             "total_tickets": total,
@@ -45,8 +47,11 @@ class TicketRepository:
         }
     
     @staticmethod
-    def update_ticket_status(db: Session, ticket_id: int, update_data: TicketUpdateStatus):
-        db_ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+    def update_ticket_status(db: Session, ticket_id: int, dosen_id: str, update_data: TicketUpdateStatus):
+        db_ticket = db.query(Ticket).filter(
+            Ticket.id == ticket_id,
+            Ticket.dosen_id == dosen_id
+            ).first()
         if db_ticket:
             db_ticket.status = update_data.status
             db_ticket.komentar_dosen = update_data.komentar_dosen

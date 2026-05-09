@@ -42,7 +42,7 @@ def get_ticket_types(db: Session = Depends(get_db)):
 # ENDPOINT: AMBIL DAFTAR DOSEN
 @router.get("/lecturers", response_model=List[DosenResponse])
 def get_lecturers(db: Session = Depends(get_db)):
-    lecturers = db.query(User).filter(User.role == "DOSEN").all()
+    lecturers = db.query(User.id_user, Dosen.nama).join(Dosen, User.id_user == Dosen.id_user).filter(User.role == "DOSEN").all()
     return [{"id_user": l.id_user, "nama": l.nama} for l in lecturers]
 
 # ENDPOINT: BUAT TIKET BARU 
@@ -75,7 +75,7 @@ def get_my_dashboard_stats(
     db: Session = Depends(get_db),
     current_user: any = Depends(get_current_user)
 ):
-    return TicketRepository.get_dashboard_stats(db=db, user_id=current_user.id_user)
+    return TicketRepository.get_dashboard_stats(db=db, user_id=current_user.id_user, role=current_user.role)
 
 # ENDPOINT: DAFTAR RIWAYAT TICKET
 @router.get("/my-tickets", response_model=List[TicketResponse])
