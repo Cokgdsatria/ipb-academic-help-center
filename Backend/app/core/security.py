@@ -1,15 +1,18 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from app.core.config import settings
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class SecurityHandler:
 
     SECRET_KEY = settings.SECRET_KEY
-    ALGORITHM = "HS256"
+    ALGORITHM = settings.ALGORITHM
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
     @staticmethod
@@ -29,9 +32,9 @@ class SecurityHandler:
         to_encode = data.copy()
 
         if expires_delta:
-            expire = datetime.utcnow() + expires_delta
+            expire = datetime.now(timezone.utc) + expires_delta
         else: 
-            expire = datetime.utcnow() + timedelta(minutes=SecurityHandler.ACCESS_TOKEN_EXPIRE_MINUTES)
+            expire = datetime.now(timezone.utc) + timedelta(minutes=SecurityHandler.ACCESS_TOKEN_EXPIRE_MINUTES)
 
         to_encode.update({"exp": expire})
 

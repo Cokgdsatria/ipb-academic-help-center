@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Info, Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { ticketService } from '../services/ticketService';
 import Navbar from '../components/Navbar';
 import Badge from '../components/Badge';
 import IPBLogo from '../components/IPBLogo';
@@ -9,12 +11,38 @@ export default function BerandaMahasiswa() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // const statusItems = [
+  //   { label: 'Total Tiket', count: 3, color: 'bg-blue-100 text-blue-700' },
+  //   { label: 'Menunggu', count: 1, color: 'bg-yellow-100 text-yellow-700' },
+  //   { label: 'Diproses', count: 0, color: 'bg-blue-100 text-blue-600' },
+  //   { label: 'Selesai', count: 1, color: 'bg-green-100 text-green-700' },
+  //   { label: 'Ditolak', count: 2, color: 'bg-red-100 text-red-700' },
+  // ];
+
+  const [stats, setStats] = useState({
+    total_tickets: 0,
+    pending_tickets: 0,
+    completed_tickets: 0,
+    rejected_tickets: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await ticketService.getStats();
+        setStats(data);
+      } catch (error) {
+        console.error('Gagal mengambil statistik:', error);
+      }
+    };
+    fetchStats();
+  }, []);
+
   const statusItems = [
-    { label: 'Total Tiket', count: 3, color: 'bg-blue-100 text-blue-700' },
-    { label: 'Menunggu', count: 1, color: 'bg-yellow-100 text-yellow-700' },
-    { label: 'Diproses', count: 0, color: 'bg-blue-100 text-blue-600' },
-    { label: 'Selesai', count: 1, color: 'bg-green-100 text-green-700' },
-    { label: 'Ditolak', count: 2, color: 'bg-red-100 text-red-700' },
+    {label: 'Total Tiket', count: stats.total_tickets, color: 'bg-blue-100 text-blue-700'},
+    {label: 'Menunggu', count: stats.pending_tickets, color: 'bg-yellow-100 text-yellow-700'},
+    {label: 'Selesai', count: stats.completed_tickets, color: 'bg-green-100 text-green-700'},
+    {label: 'Ditolak', count: stats.rejected_tickets, color: 'bg-red-100 text-red-700'}
   ];
 
   return (

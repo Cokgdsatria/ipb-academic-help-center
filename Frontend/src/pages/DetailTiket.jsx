@@ -1,19 +1,110 @@
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, FileText, User } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import { dummyTickets } from '../data/dummy';
+import { ticketService } from '../services/ticketService';
+import { useAuth } from '../context/AuthContext';
 
 export default function DetailTiket() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const ticket = dummyTickets.find((t) => t.id === `#${id}`);
+  const { user } = useAuth();
+  const [ticket, setTicket] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const topikMap = {
+    '1': 'Pengajuan Surat',
+    '2': 'Pengajuan Bimbingan',
+    '3': 'Pengajuan Akademik',
+  };
+
+  const statusMap = {
+    PENDING: 'Menunggu',
+    RESOLVED: 'Selesai',
+    REJECTED: 'Ditolak',
+  };
+
+  const formatDateTime = (isoString) => {
+    if (!isoString) return '-';
+    try {
+      const dt = new Date(isoString);
+      return dt.toLocaleString('id-ID', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return '-';
+    }
+  };
+
+  useEffect(() => {
+    const loadTicketDetail = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        // Backend belum punya endpoint detail by id, jadi ambil daftar lalu cari id yang sesuai
+        const myTickets = await ticketService.getMyTickets();
+        const found = myTickets.find((t) => String(t.id) === String(id));
+        if (!found) {
+          setTicket(null);
+          setError('Tiket tidak ditemukan atau Anda tidak punya akses.');
+          return;
+        }
+        setTicket(found);
+      } catch (err) {
+        setError(err?.response?.data?.detail || 'Gagal memuat detail tiket.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTicketDetail();
+  }, [id]);
+
+  const uiTicket = useMemo(() => {
+    if (!ticket) return null;
+    return {
+      idLabel: `#${ticket.id}`,
+      topikLabel: topikMap[String(ticket.topik)] || ticket.topik || '-',
+      statusLabel: statusMap[ticket.status] || ticket.status || '-',
+      createdAtLabel: formatDateTime(ticket.created_at),
+      komentar: ticket.komentar_dosen
+        ? [{
+            nama: 'Dosen',
+            tanggal: formatDateTime(ticket.created_at),
+            isi: ticket.komentar_dosen,
+          }]
+        : [],
+    };
+  }, [ticket]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar role={user?.role === 'DOSEN' ? 'dosen' : 'mahasiswa'} />
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <p className="text-gray-500">Memuat detail tiket...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!ticket) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar role="mahasiswa" />
+        <Navbar role={user?.role === 'DOSEN' ? 'dosen' : 'mahasiswa'} />
         <div className="max-w-4xl mx-auto px-6 py-8">
-          <p className="text-gray-500">Tiket tidak ditemukan.</p>
+          <p className="text-gray-500">{error || 'Tiket tidak ditemukan.'}</p>
+          <button
+            onClick={() => navigate('/tiket')}
+            className="mt-4 px-4 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 hover:bg-white bg-white"
+          >
+            Kembali ke daftar tiket
+          </button>
         </div>
       </div>
     );
@@ -21,7 +112,7 @@ export default function DetailTiket() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar role="mahasiswa" />
+      <Navbar role={user?.role === 'DOSEN' ? 'dosen' : 'mahasiswa'} />
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Back + Illustration */}
         <div className="flex items-start justify-between mb-4">
@@ -36,7 +127,7 @@ export default function DetailTiket() {
         </div>
 
         {/* Ticket ID */}
-        <p className="text-blue-600 font-bold text-lg mb-4">{ticket.id}</p>
+        <p className="text-blue-600 font-bold text-lg mb-4">{uiTicket.idLabel}</p>
 
         {/* Main card */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-5">
@@ -46,26 +137,42 @@ export default function DetailTiket() {
               <FileText size={26} className="text-blue-600" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">{ticket.subject}</h1>
+              <h1 className="text-lg font-bold text-gray-900">{ticket.subjek}</h1>
               <div className="flex items-center gap-2 mt-1 text-sm text-gray-400">
                 <Calendar size={14} />
-                <span>Dibuat pada: {ticket.tanggal}</span>
+                <span>Dibuat pada: {uiTicket.createdAtLabel}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                  {uiTicket.topikLabel}
+                </span>
+                <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-200">
+                  {uiTicket.statusLabel}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Description */}
           <div className="bg-gray-50 rounded-xl p-5">
-            <p className="text-sm text-gray-700 leading-relaxed">{ticket.deskripsi}</p>
+            <p className="text-sm text-gray-700 leading-relaxed">{ticket.deskripsi || '-'}</p>
           </div>
+
+          {ticket.tanggal_bimbingan && (
+            <div className="mt-4 bg-blue-50 rounded-xl p-4 border border-blue-100">
+              <p className="text-sm text-blue-800">
+                Tanggal Bimbingan: <span className="font-semibold">{ticket.tanggal_bimbingan}</span>
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Comments */}
-        {ticket.komentar.length > 0 && (
+        {/* Komentar dosen (sementara 1 komentar dari field komentar_dosen) */}
+        {uiTicket.komentar.length > 0 && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h2 className="font-bold text-gray-900 mb-4">Komentar</h2>
             <div className="space-y-4">
-              {ticket.komentar.map((k, i) => (
+              {uiTicket.komentar.map((k, i) => (
                 <div key={i} className="bg-gray-50 rounded-xl p-4">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center">

@@ -1,24 +1,57 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ticketService } from '../services/ticketService';
 import { AlertCircle, Plus, ChevronDown, FileText, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
-import { topikBantuan, daftarDosen } from '../data/dummy';
+// import { topikBantuan, daftarDosen } from '../data/dummy';
 
 export default function BukaTiketBaru() {
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const [listDosen, setListDosen] = useState([]);
+  const [listTopik, setListTopik] = useState([]);
+
+  // const [form, setForm] = useState({
+  //   topik: '',
+  //   dosen: '',
+  //   subject: '',
+  //   deskripsi: '',
+  //   tanggal: '',
+  // });
+
   const [form, setForm] = useState({
-    topik: '',
-    dosen: '',
+    id_jenis_pengajuan: '',
+    id_dosen: '',
     subject: '',
     deskripsi: '',
-    tanggal: '',
+    tanggal_bimbingan: '',
   });
+
+  useEffect(() => {
+    const loadData = async () => {
+      try{
+        const [dosenData, topikData] = await Promise.all([
+          ticketService.getLecturers(),
+          ticketService.getTicketTypes()
+        ]);
+
+        setListDosen(dosenData);
+        setListTopik(topikData);
+      } catch (error) {
+        console.error('Gagal mengambil data:', error);
+      }
+    };
+    loadData();
+  }, []);
+
   const [files, setFiles] = useState([]);
   const [success, setSuccess] = useState(false);
 
-  const isSuratTopic = form.topik && form.topik.includes('Surat');
+  const selectedTopikId = Number(form.id_jenis_pengajuan);
+  const isSuratTopic = selectedTopikId === 1;
+  const isBimbinganTopic = selectedTopikId === 2;
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -29,25 +62,53 @@ export default function BukaTiketBaru() {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
-    if (!form.topik || !form.dosen || !form.subject || !form.deskripsi) {
+  // const handleSubmit = () => {
+  //   if (!form.topik || !form.dosen || !form.subject || !form.deskripsi) {
+  //     alert('Lengkapi semua field terlebih dahulu.');
+  //     return;
+  //   }
+  //   if (form.topik === 'Pengajuan Bimbingan' && !form.tanggal) {
+  //     alert('Lengkapi tanggal bimbingan terlebih dahulu.');
+  //     return;
+  //   }
+  //   if (isSuratTopic && files.length === 0) {
+  //     alert('Silahkan upload minimal satu file untuk pengajuan surat.');
+  //     return;
+  //   }
+  //   setSuccess(true);
+  //   setTimeout(() => {
+  //     navigate('/tiket');
+  //   }, 1500);
+  // };
+
+  const handleSubmit = async () => {
+    if (!form.id_jenis_pengajuan || !form.id_dosen || !form.subject || !form.deskripsi) {
       alert('Lengkapi semua field terlebih dahulu.');
       return;
     }
-    if (form.topik === 'Pengajuan Bimbingan' && !form.tanggal) {
+
+    if (isBimbinganTopic && !form.tanggal_bimbingan) {
       alert('Lengkapi tanggal bimbingan terlebih dahulu.');
       return;
     }
-    if (isSuratTopic && files.length === 0) {
-      alert('Silahkan upload minimal satu file untuk pengajuan surat.');
-      return;
-    }
-    setSuccess(true);
-    setTimeout(() => {
-      navigate('/tiket');
-    }, 1500);
-  };
 
+    try{
+      await ticketService.createTicket({
+        judul: form.subject,
+        deskripsi: form.deskripsi,
+        id_jenis_pengajuan: parseInt(form.id_jenis_pengajuan),
+        id_dosen: parseInt(form.id_dosen),
+        tanggal_bimbingan: form.tanggal_bimbingan || null
+      });
+
+      setSuccess(true);
+      setTimeout(() => {
+        navigate('/tiket');
+      }, 1500);
+    } catch (error) {
+      alert('Gagal mengirim tiket. Silakan cek koneksi atau RLS Supabase Anda.');
+    }
+  }
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar role="mahasiswa" />
@@ -86,13 +147,21 @@ export default function BukaTiketBaru() {
               <label className="text-sm font-semibold text-gray-700">Topik Bantuan</label>
               <div className="col-span-2 relative">
                 <select
-                  value={form.topik}
-                  onChange={(e) => setForm({ ...form, topik: e.target.value })}
+                  value={form.id_jenis_pengajuan}
+                  onChange={(e) => {
+                    const nextTopik = e.target.value;
+                    setForm((prev) => ({
+                      ...prev,
+                      id_jenis_pengajuan: nextTopik,
+                      // Kosongkan tanggal jika topik bukan Pengajuan Bimbingan
+                      tanggal_bimbingan: Number(nextTopik) === 2 ? prev.tanggal_bimbingan : '',
+                    }));
+                  }}
                   className="w-full appearance-none px-4 py-3 pr-10 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700"
                 >
                   <option value="">-- Pilih Topik Bantuan --</option>
-                  {topikBantuan.map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                  {listTopik.map((t) => (
+                    <option key={t.id} value={t.id}>{t.nama_jenis}</option>
                   ))}
                 </select>
                 <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -104,13 +173,13 @@ export default function BukaTiketBaru() {
               <label className="text-sm font-semibold text-gray-700">Nama Dosen</label>
               <div className="col-span-2 relative">
                 <select
-                  value={form.dosen}
-                  onChange={(e) => setForm({ ...form, dosen: e.target.value })}
+                  value={form.id_dosen}
+                  onChange={(e) => setForm({ ...form, id_dosen: e.target.value })}
                   className="w-full appearance-none px-4 py-3 pr-10 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700"
                 >
                   <option value="">-- Pilih Dosen Tujuan --</option>
-                  {daftarDosen.map((d) => (
-                    <option key={d} value={d}>{d}</option>
+                  {listDosen.map((d) => (
+                    <option key={d.id_user} value={d.id_user}>{d.nama}</option>
                   ))}
                 </select>
                 <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -132,14 +201,14 @@ export default function BukaTiketBaru() {
             </div>
 
             {/* Tanggal Bimbingan - hanya untuk Pengajuan Bimbingan */}
-            {form.topik === 'Pengajuan Bimbingan' && (
+            {isBimbinganTopic && (
               <div className="grid grid-cols-3 gap-4 items-center">
-                <label className="text-sm font-semibold text-gray-700">Tanggal</label>
+                <label className="text-sm font-semibold text-gray-700">Tanggal Bimbingan</label>
                 <div className="col-span-2">
                   <input
                     type="date"
-                    value={form.tanggal}
-                    onChange={(e) => setForm({ ...form, tanggal: e.target.value })}
+                    value={form.tanggal_bimbingan}
+                    onChange={(e) => setForm({ ...form, tanggal_bimbingan: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>

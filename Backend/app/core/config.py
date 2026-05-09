@@ -4,6 +4,7 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str
     SECRET_KEY: str
+    ALGORITHM: str = "HS256"
     port: int = 8000
 
     model_config = SettingsConfigDict(
