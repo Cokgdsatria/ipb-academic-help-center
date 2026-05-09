@@ -51,7 +51,7 @@ export default function LoginPage() {
           <div className="flex items-center gap-3">
             <IPBLogo size={44} white />
             <div>
-              <div className="text-white font-bold text-lg">IPB Academic</div>
+              <div className="text-white font-bold text-lg">IPB Logicore</div>
               <div className="text-blue-200 text-sm">Help Center</div>
             </div>
           </div>
