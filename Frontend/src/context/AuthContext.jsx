@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { dummyUser } from '../data/dummy';
 
 const AuthContext = createContext(null);
@@ -6,19 +6,50 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
-  const login = (username, password) => {
-    if (username === 'mahasiswa' && password === dummyUser.mahasiswa.password) {
-      setUser(dummyUser.mahasiswa);
-      return { success: true, role: 'mahasiswa' };
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
     }
-    if (username === 'dosen' && password === dummyUser.dosen.password) {
-      setUser(dummyUser.dosen);
-      return { success: true, role: 'dosen' };
-    }
-    return { success: false };
-  };
+  }, []);
 
-  const logout = () => setUser(null);
+  const login = async (email, password) => {
+    try{
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) throw new Error('Login Gagal');
+
+      const data = await response.json();
+
+      setUser(data);
+      localStorage.setItem('user', JSON.stringify(data));
+
+      return { success: true, role: data.role };
+    } catch (error) {
+
+      console.error(error);
+      return { success: false, message: error.message };
+
+    // if (email === 'mahasiswa@example.com' && password === dummyUser.mahasiswa.password) {
+    //   setUser(dummyUser.mahasiswa);
+    //   return { success: true, role: 'mahasiswa' };
+    // }
+    // if (email === 'dosen@example.com' && password === dummyUser.dosen.password) {
+    //   setUser(dummyUser.dosen);
+    //   return { success: true, role: 'dosen' };
+    // }
+    // return { success: false };
+  }
+};
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+  };
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

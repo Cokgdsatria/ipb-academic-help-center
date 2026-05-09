@@ -1,1 +1,1 @@
-# ipb-academic-help-center
+# ipb-logicore-help-center
