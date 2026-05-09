@@ -9,11 +9,12 @@ class TicketRepository:
     def create_ticket(db: Session, ticket_data: TicketCreate, mahasiswa_id: str):
         new_ticket = Ticket(
             mahasiswa_id=mahasiswa_id,
-            dosen_id=ticket_data.dosen_id,
-            topik=ticket_data.topik,
-            subjek=ticket_data.subjek,
+            dosen_id=ticket_data.id_dosen,
+            topik=str(ticket_data.id_jenis_pengajuan),  # Map id_jenis_pengajuan to topik
+            subjek=ticket_data.judul,  # Map judul to subjek
             deskripsi=ticket_data.deskripsi,
-            status="MENUNGGU" #default status
+            tanggal_bimbingan=ticket_data.tanggal_bimbingan,  # Save tanggal if provided
+            status="PENDING"  # Default status
         )
         db.add(new_ticket)
         db.commit()
@@ -32,9 +33,9 @@ class TicketRepository:
         total = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id).count()
 
         #Berdasarkan status
-        pending = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id, Ticket.status == "MENUNGGU").count()
-        completed = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id, Ticket.status == "SELESAI").count()
-        rejected = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id, Ticket.status == "DITOLAK").count()
+        pending = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id, Ticket.status == "PENDING").count()
+        completed = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id, Ticket.status == "RESOLVED").count()
+        rejected = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id, Ticket.status == "REJECTED").count()
 
         return {
             "total_tickets": total,
@@ -45,10 +46,10 @@ class TicketRepository:
     
     @staticmethod
     def update_ticket_status(db: Session, ticket_id: int, update_data: TicketUpdateStatus):
-        db_ticket = db.query(Ticket).filter(Ticket-id == ticket_id).first()
+        db_ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
         if db_ticket:
             db_ticket.status = update_data.status
             db_ticket.komentar_dosen = update_data.komentar_dosen
-            db_ticket.commit()
-            db_ticket.refresh(db_ticket)
+            db.commit()
+            db.refresh(db_ticket)
         return db_ticket

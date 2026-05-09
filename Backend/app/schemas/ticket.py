@@ -1,23 +1,23 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 
 class TicketCreate(BaseModel):
-    topik: str
-    dosen_id: Optional[int] = None
-    subjek: str
-    deskripsi: Optional[str] = None
+    judul: str
+    deskripsi: str
+    id_jenis_pengajuan: int
+    id_dosen: int
+    tanggal_bimbingan: Optional[date] = None  # Optional, hanya untuk bimbingan
 
 class TicketResponse(BaseModel):
     id: int
-    topik: str
-    created_at: datetime
-    status: str #MENUNGGU, SELESAI, DITOLAK
-
-    # Field modal Detail
     subjek: str
-    deskripsi: Optional[str] = None # Detail Masalah
+    created_at: datetime
+    status: str
+
+    deskripsi: Optional[str] = None
     dosen_id: Optional[int] = None
+    tanggal_bimbingan: Optional[date] = None
     komentar_dosen: Optional[str] = None
 
     class Config:
