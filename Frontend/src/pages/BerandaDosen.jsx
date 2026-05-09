@@ -1,7 +1,8 @@
-import { FileText, Clock, CheckCircle, XCircle, FileCheck } from 'lucide-react';
+import { FileText, Clock, XCircle, FileCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
-import { statsData } from '../data/dummy';
+import { useState, useEffect } from 'react';
+import { ticketService } from '../services/ticketService';
 
 const StatCard = ({ icon: Icon, iconBg, iconColor, label, count, change, changeColor }) => (
   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-3">
@@ -15,8 +16,7 @@ const StatCard = ({ icon: Icon, iconBg, iconColor, label, count, change, changeC
       </div>
     </div>
     <div className={`flex items-center gap-1 text-sm font-medium ${changeColor}`}>
-      <span>↑</span>
-      <span>{change}</span>
+      <span>{count > 0 ? '↑ Aktif' : '-'}</span>
     </div>
   </div>
 );
@@ -24,33 +24,77 @@ const StatCard = ({ icon: Icon, iconBg, iconColor, label, count, change, changeC
 export default function BerandaDosen() {
   const { user } = useAuth();
 
-  const stats = [
+  const [stats, setStats] = useState({
+    total_tickets: 0,
+    pending_tickets: 0,
+    completed_tickets: 0,
+    rejected_tickets: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Gunakan endpoint stats yang tersedia di service
+        const data = await ticketService.getStats();
+        setStats(data);
+      } catch (error) {
+        console.error("Gagal mengambil statistik dosen:", error);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const statItems = [
     {
       icon: FileText, iconBg: 'bg-blue-50', iconColor: 'text-blue-600',
-      label: 'Total', count: statsData.total,
-      change: '30% dari minggu lalu', changeColor: 'text-green-600',
+      label: 'Total Masuk', count: stats.total_tickets,
+      changeColor: 'text-blue-600',
     },
     {
-      icon: Clock, iconBg: 'bg-yellow-50', iconColor: 'text-yellow-500',
-      label: 'Menunggu', count: statsData.menunggu,
-      change: '75% dari minggu lalu', changeColor: 'text-green-600',
+      icon: Clock, iconBg: 'bg-yellow-50', iconColor: 'text-yellow-600',
+      label: 'Menunggu', count: stats.pending_tickets,
+      changeColor: 'text-yellow-600',
     },
     {
-      icon: CheckCircle, iconBg: 'bg-green-50', iconColor: 'text-green-600',
-      label: 'Disetujui', count: statsData.disetujui,
-      change: '42% dari minggu lalu', changeColor: 'text-green-600',
+      icon: FileCheck, iconBg: 'bg-green-50', iconColor: 'text-green-600',
+      label: 'Selesai', count: stats.completed_tickets,
+      changeColor: 'text-green-600',
     },
     {
       icon: XCircle, iconBg: 'bg-red-50', iconColor: 'text-red-500',
-      label: 'Ditolak', count: statsData.ditolak,
-      change: '24% dari minggu lalu', changeColor: 'text-red-500',
-    },
-    {
-      icon: FileCheck, iconBg: 'bg-purple-50', iconColor: 'text-purple-600',
-      label: 'Selesai', count: statsData.selesai,
-      change: '30% dari minggu lalu', changeColor: 'text-green-600',
+      label: 'Ditolak', count: stats.rejected_tickets,
+      changeColor: 'text-red-500',
     },
   ];
+
+  // const stats = [
+  //   {
+  //     icon: FileText, iconBg: 'bg-blue-50', iconColor: 'text-blue-600',
+  //     label: 'Total', count: statsData.total,
+  //     change: '30% dari minggu lalu', changeColor: 'text-green-600',
+  //   },
+  //   {
+  //     icon: Clock, iconBg: 'bg-yellow-50', iconColor: 'text-yellow-500',
+  //     label: 'Menunggu', count: statsData.menunggu,
+  //     change: '75% dari minggu lalu', changeColor: 'text-green-600',
+  //   },
+  //   {
+  //     icon: CheckCircle, iconBg: 'bg-green-50', iconColor: 'text-green-600',
+  //     label: 'Disetujui', count: statsData.disetujui,
+  //     change: '42% dari minggu lalu', changeColor: 'text-green-600',
+  //   },
+  //   {
+  //     icon: XCircle, iconBg: 'bg-red-50', iconColor: 'text-red-500',
+  //     label: 'Ditolak', count: statsData.ditolak,
+  //     change: '24% dari minggu lalu', changeColor: 'text-red-500',
+  //   },
+  //   {
+  //     icon: FileCheck, iconBg: 'bg-purple-50', iconColor: 'text-purple-600',
+  //     label: 'Selesai', count: statsData.selesai,
+  //     change: '30% dari minggu lalu', changeColor: 'text-green-600',
+  //   },
+  // ];
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -67,12 +111,12 @@ export default function BerandaDosen() {
 
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-5 mb-5">
-          {stats.slice(0, 3).map((s) => (
+          {statItems.slice(0, 3).map((s) => (
             <StatCard key={s.label} {...s} />
           ))}
         </div>
         <div className="grid grid-cols-2 gap-5 max-w-2xl">
-          {stats.slice(3).map((s) => (
+          {statItems.slice(3).map((s) => (
             <StatCard key={s.label} {...s} />
           ))}
         </div>
