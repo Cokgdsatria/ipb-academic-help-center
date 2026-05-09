@@ -1,5 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import PageTransition from './components/PageTransition';
 import LoginPage from './pages/LoginPage';
 import BerandaMahasiswa from './pages/BerandaMahasiswa';
 import BerandaDosen from './pages/BerandaDosen';
@@ -22,10 +24,12 @@ function ProtectedRoute({ children, requiredRole }) {
 
 function AppRoutes() {
   const { user } = useAuth();
+  const location = useLocation();
 
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
 
       <Route path="/" element={
         user
@@ -35,28 +39,29 @@ function AppRoutes() {
 
       {/* Mahasiswa */}
       <Route path="/beranda" element={
-        <ProtectedRoute requiredRole="mahasiswa"><BerandaMahasiswa /></ProtectedRoute>
+        <PageTransition><ProtectedRoute requiredRole="mahasiswa"><BerandaMahasiswa /></ProtectedRoute></PageTransition>
       } />
       <Route path="/tiket/baru" element={
-        <ProtectedRoute requiredRole="MAHASISWA"><BukaTiketBaru /></ProtectedRoute>
+        <PageTransition><ProtectedRoute requiredRole="MAHASISWA"><BukaTiketBaru /></ProtectedRoute></PageTransition>
       } />
       <Route path="/tiket" element={
-        <ProtectedRoute requiredRole="MAHASISWA"><TiketPage /></ProtectedRoute>
+        <PageTransition><ProtectedRoute requiredRole="MAHASISWA"><TiketPage /></ProtectedRoute></PageTransition>
       } />
       <Route path="/tiket/:id" element={
-        <ProtectedRoute requiredRole="MAHASISWA"><DetailTiket /></ProtectedRoute>
+        <PageTransition><ProtectedRoute requiredRole="MAHASISWA"><DetailTiket /></ProtectedRoute></PageTransition>
       } />
 
       {/* Dosen */}
       <Route path="/dosen/beranda" element={
-        <ProtectedRoute requiredRole="DOSEN"><BerandaDosen /></ProtectedRoute>
+        <PageTransition><ProtectedRoute requiredRole="DOSEN"><BerandaDosen /></ProtectedRoute></PageTransition>
       } />
       <Route path="/dosen/pengajuan" element={
-        <ProtectedRoute requiredRole="DOSEN"><PengajuanDosen /></ProtectedRoute>
+        <PageTransition><ProtectedRoute requiredRole="DOSEN"><PengajuanDosen /></ProtectedRoute></PageTransition>
       } />
 
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+    </AnimatePresence>
   );
 }
 
