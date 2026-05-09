@@ -11,6 +11,7 @@ class TicketCreate(BaseModel):
 
 class TicketResponse(BaseModel):
     id: int
+    topik: Optional[str] = None
     subjek: str
     created_at: datetime
     status: str

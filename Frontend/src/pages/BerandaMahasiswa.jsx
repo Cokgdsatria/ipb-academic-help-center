@@ -20,10 +20,10 @@ export default function BerandaMahasiswa() {
   // ];
 
   const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    resolved: 0,
-    rejected: 0,
+    total_tickets: 0,
+    pending_tickets: 0,
+    completed_tickets: 0,
+    rejected_tickets: 0,
   });
 
   useEffect(() => {
@@ -39,10 +39,10 @@ export default function BerandaMahasiswa() {
   }, []);
 
   const statusItems = [
-    {label: 'Total Tiket', count: stats.total, color: 'bg-blue-100 text-blue-700'},
-    {label: 'Menunggu', count: stats.pending, color: 'bg-yellow-100 text-yellow-700'},
-    {label: 'Selesai', count: stats.resolved, color: 'bg-green-100 text-green-700'},
-    {label: 'Ditolak', count: stats.rejected, color: 'bg-red-100 text-red-700'}
+    {label: 'Total Tiket', count: stats.total_tickets, color: 'bg-blue-100 text-blue-700'},
+    {label: 'Menunggu', count: stats.pending_tickets, color: 'bg-yellow-100 text-yellow-700'},
+    {label: 'Selesai', count: stats.completed_tickets, color: 'bg-green-100 text-green-700'},
+    {label: 'Ditolak', count: stats.rejected_tickets, color: 'bg-red-100 text-red-700'}
   ];
 
   return (
