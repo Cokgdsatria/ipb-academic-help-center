@@ -54,8 +54,8 @@ export default function PengajuanDosen() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar role="dosen" />
+    <div className="min-h-screen bg-transparent">
+
       <div className="max-w-5xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="mb-6">

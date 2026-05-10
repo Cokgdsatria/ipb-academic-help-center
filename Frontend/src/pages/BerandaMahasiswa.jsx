@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Info, Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ticketService } from '../services/ticketService';
-import Navbar from '../components/Navbar';
 import Badge from '../components/Badge';
 import IPBLogo from '../components/IPBLogo';
 
@@ -46,8 +45,7 @@ export default function BerandaMahasiswa() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar role="mahasiswa" />
+    <div className="min-h-screen bg-transparent">
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Greeting */}
         <div className="mb-6">

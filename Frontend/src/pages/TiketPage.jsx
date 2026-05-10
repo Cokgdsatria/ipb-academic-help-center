@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, RefreshCw, Plus, ChevronDown } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import Badge from '../components/Badge';
 import { ticketService } from '../services/ticketService';
 
@@ -84,8 +83,8 @@ export default function TiketPage() {
   const statusOptions = ['Semua Status', 'Menunggu', 'Diproses', 'Selesai', 'Ditolak'];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar role="mahasiswa" />
+    <div className="min-h-screen bg-transparent">
+
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Search */}
         <div className="relative mb-3">

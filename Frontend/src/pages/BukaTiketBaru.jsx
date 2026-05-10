@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { ticketService } from '../services/ticketService';
 import { AlertCircle, Plus, ChevronDown, FileText, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
 // import { topikBantuan, daftarDosen } from '../data/dummy';
 
 export default function BukaTiketBaru() {
@@ -110,8 +109,7 @@ export default function BukaTiketBaru() {
     }
   }
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar role="mahasiswa" />
+    <div className="min-h-screen bg-transparent">
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Buat Tiket Baru</h1>

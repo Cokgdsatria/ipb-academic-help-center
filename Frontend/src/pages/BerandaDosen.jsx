@@ -1,6 +1,5 @@
 import { FileText, Clock, XCircle, FileCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
 import { useState, useEffect } from 'react';
 import { ticketService } from '../services/ticketService';
 
@@ -97,8 +96,7 @@ export default function BerandaDosen() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar role="dosen" />
+    <div className="min-h-screen bg-transparent">
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Greeting */}
         <div className="mb-8">

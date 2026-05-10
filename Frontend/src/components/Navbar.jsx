@@ -48,10 +48,10 @@ export default function Navbar({ role = 'mahasiswa' }) {
               <Link
                 key={link.to}
                 to={link.to}
-                className={`text-sm font-medium transition-colors relative pb-1 ${
+                className={`text-sm font-medium relative pb-1 ${
                   isActive
                     ? 'text-blue-600 after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-blue-600 after:rounded-full'
-                    : 'text-gray-600 hover:text-blue-600'
+                    : 'text-gray-600'
                 }`}
               >
                 {link.label}
@@ -70,7 +70,7 @@ export default function Navbar({ role = 'mahasiswa' }) {
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-600"
           >
             <LogOut size={15} />
             <span>Keluar</span>

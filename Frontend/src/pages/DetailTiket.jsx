@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, FileText, User } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import { ticketService } from '../services/ticketService';
 import { useAuth } from '../context/AuthContext';
 
@@ -84,8 +83,7 @@ export default function DetailTiket() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar role={user?.role === 'DOSEN' ? 'dosen' : 'mahasiswa'} />
+      <div className="min-h-screen bg-transparent">
         <div className="max-w-4xl mx-auto px-6 py-8">
           <p className="text-gray-500">Memuat detail tiket...</p>
         </div>
@@ -95,8 +93,7 @@ export default function DetailTiket() {
 
   if (!ticket) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar role={user?.role === 'DOSEN' ? 'dosen' : 'mahasiswa'} />
+      <div className="min-h-screen bg-transparent">
         <div className="max-w-4xl mx-auto px-6 py-8">
           <p className="text-gray-500">{error || 'Tiket tidak ditemukan.'}</p>
           <button
@@ -111,8 +108,7 @@ export default function DetailTiket() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar role={user?.role === 'DOSEN' ? 'dosen' : 'mahasiswa'} />
+    <div className="min-h-screen bg-transparent">
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Back + Illustration */}
         <div className="flex items-start justify-between mb-4">
