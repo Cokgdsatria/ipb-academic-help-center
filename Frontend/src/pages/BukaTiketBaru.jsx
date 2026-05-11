@@ -92,12 +92,33 @@ export default function BukaTiketBaru() {
     }
 
     try{
+      let fileName = null;
+      let fileData = null;
+
+      if (isSuratTopic && files.length > 0) {
+        // Hanya ambil file pertama untuk disubmit (contoh sederhana)
+        const file = files[0];
+        fileName = file.name;
+        
+        // Convert to base64
+        const toBase64 = (f) => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(f);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = error => reject(error);
+        });
+
+        fileData = await toBase64(file);
+      }
+
       await ticketService.createTicket({
         judul: form.subject,
         deskripsi: form.deskripsi,
         id_jenis_pengajuan: parseInt(form.id_jenis_pengajuan),
         id_dosen: parseInt(form.id_dosen),
-        tanggal_bimbingan: form.tanggal_bimbingan || null
+        tanggal_bimbingan: form.tanggal_bimbingan || null,
+        file_name: fileName,
+        file_data: fileData
       });
 
       setSuccess(true);

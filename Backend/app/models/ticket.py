@@ -11,6 +11,8 @@ class Ticket(Base):
     topik = Column(String, nullable=False)
     subjek = Column(String, nullable=False)
     deskripsi = Column(Text, nullable=True)
+    file_name = Column(String, nullable=True)
+    file_data = Column(Text, nullable=True)
     tanggal_bimbingan = Column(Date, nullable=True)  # Untuk pengajuan bimbingan
     status = Column(String, default="PENDING")
     komentar_dosen = Column(Text, nullable=True)
