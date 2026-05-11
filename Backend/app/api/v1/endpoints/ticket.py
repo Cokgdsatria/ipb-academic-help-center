@@ -7,6 +7,7 @@ from app.core.database import get_db # Benar
 from app.schemas.ticket import (
     TicketCreate,
     TicketResponse,
+    TicketDetailResponse,
     TicketUpdateStatus,
     DashboardStats
 )
@@ -88,6 +89,22 @@ def get_all_my_tickets(
         user_id=current_user.id_user,
         role=current_user.role
     )
+
+# ENDPOINT: AMBIL DETAIL TICKET BESERTA FILE
+@router.get("/{ticket_id}", response_model=TicketDetailResponse)
+def get_ticket_detail(
+    ticket_id: int,
+    db: Session = Depends(get_db),
+    current_user: any = Depends(get_current_user)
+):
+    ticket = TicketRepository.get_ticket_by_id(db=db, ticket_id=ticket_id)
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Tiket tidak ditemukan")
+    if current_user.role == "DOSEN" and ticket.dosen_id != current_user.id_user:
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    if current_user.role == "MAHASISWA" and ticket.mahasiswa_id != current_user.id_user:
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    return ticket
 
 #ENDPOINT: UPDATE STATUS TICKET (DOSEN)
 @router.patch("/{ticket_id}/status", response_model=TicketResponse)

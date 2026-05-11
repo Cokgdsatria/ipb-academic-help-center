@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, RefreshCw, Plus, ChevronDown } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import Badge from '../components/Badge';
 import { ticketService } from '../services/ticketService';
 
@@ -84,9 +83,9 @@ export default function TiketPage() {
   const statusOptions = ['Semua Status', 'Menunggu', 'Diproses', 'Selesai', 'Ditolak'];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar role="mahasiswa" />
-      <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="min-h-screen bg-transparent">
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Search */}
         <div className="relative mb-3">
           <input
@@ -114,7 +113,7 @@ export default function TiketPage() {
         </div>
 
         {/* Toolbar */}
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500">
               {loading ? 'Memuat...' : `Total tiket: ${tickets.length}`}
@@ -129,15 +128,15 @@ export default function TiketPage() {
           </div>
           <button
             onClick={() => navigate('/tiket/baru')}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm shadow-sm"
+            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm shadow-sm w-full sm:w-auto"
           >
             <Plus size={16} />
             Buka Tiket Baru
           </button>
         </div>
 
-        {/* Table */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        {/* Desktop Table */}
+        <div className="hidden sm:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100">
@@ -188,6 +187,46 @@ export default function TiketPage() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="sm:hidden space-y-3">
+          {loading && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center text-sm text-gray-400">
+              Memuat...
+            </div>
+          )}
+          {!loading && error && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center text-sm text-red-500">
+              {error}
+            </div>
+          )}
+          {!loading && !error && filtered.length === 0 && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center text-sm text-gray-400">
+              Tidak ada tiket ditemukan.
+            </div>
+          )}
+          {filtered.map((ticket, index) => (
+            <div key={ticket.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span
+                  className="text-sm font-bold text-blue-600 cursor-pointer hover:underline"
+                  onClick={() => navigate(`/tiket/${ticket.id}`)}
+                >
+                  {ticket.idLabel}
+                </span>
+                <Badge status={ticket.statusLabel} />
+              </div>
+              <p className="text-sm font-medium text-gray-800 mb-1">{ticket.topikLabel}</p>
+              <p className="text-xs text-gray-400 mb-3">{ticket.tanggalLabel}</p>
+              <button
+                onClick={() => navigate(`/tiket/${ticket.id}`)}
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Lihat Detail
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </div>

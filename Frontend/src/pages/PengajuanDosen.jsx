@@ -54,12 +54,12 @@ export default function PengajuanDosen() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar role="dosen" />
-      <div className="max-w-5xl mx-auto px-6 py-8">
+    <div className="min-h-screen bg-transparent">
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Pengajuan</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Pengajuan</h1>
           <p className="text-gray-500 text-sm mt-1">Kelola semua pengajuan</p>
         </div>
 
@@ -85,15 +85,15 @@ export default function PengajuanDosen() {
           {filtered.map((ticket) => {
             const colors = iconColors[ticket.status] || iconColors.Selesai;
             return (
-              <div key={ticket.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
-                    <div className={`w-14 h-14 ${colors.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                      <FileText size={26} className={colors.icon} />
+              <div key={ticket.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div className={`w-12 h-12 sm:w-14 sm:h-14 ${colors.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                      <FileText size={22} className={colors.icon} />
                     </div>
                     <div>
                       <div className="flex items-center gap-3 mb-1">
-                        <h3 className="font-bold text-gray-900">{ticket.subject}</h3>
+                        <h3 className="font-bold text-gray-900 text-sm sm:text-base">{ticket.subject}</h3>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                         <span>Diajukan oleh</span>
@@ -107,18 +107,18 @@ export default function PengajuanDosen() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-3">
+                  <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 sm:gap-3 pl-0 sm:pl-0">
                     <Badge status={ticket.status} />
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setModalDetail(ticket)}
-                        className="px-4 py-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="px-3 sm:px-4 py-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
                       >
                         Lihat Detail
                       </button>
                       <button
                         onClick={() => setModalUpdate(ticket)}
-                        className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors"
+                        className="px-3 sm:px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors"
                       >
                         Update Status
                       </button>

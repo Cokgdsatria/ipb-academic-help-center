@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import PageTransition from './components/PageTransition';
+import Navbar from './components/Navbar';
 import LoginPage from './pages/LoginPage';
 import BerandaMahasiswa from './pages/BerandaMahasiswa';
 import BerandaDosen from './pages/BerandaDosen';
@@ -25,9 +26,13 @@ function ProtectedRoute({ children, requiredRole }) {
 function AppRoutes() {
   const { user } = useAuth();
   const location = useLocation();
+  const isLoginPage = location.pathname === '/login';
+  const navbarRole = user?.role?.toUpperCase() === 'DOSEN' ? 'dosen' : 'mahasiswa';
 
   return (
-    <AnimatePresence mode="wait">
+    <>
+      {!isLoginPage && <Navbar role={navbarRole} />}
+      <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
 
@@ -62,6 +67,7 @@ function AppRoutes() {
       <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>
+    </>
   );
 }
 

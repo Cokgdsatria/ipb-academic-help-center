@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { ticketService } from '../services/ticketService';
 import { AlertCircle, Plus, ChevronDown, FileText, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
 // import { topikBantuan, daftarDosen } from '../data/dummy';
 
 export default function BukaTiketBaru() {
@@ -93,12 +92,33 @@ export default function BukaTiketBaru() {
     }
 
     try{
+      let fileName = null;
+      let fileData = null;
+
+      if (isSuratTopic && files.length > 0) {
+        // Hanya ambil file pertama untuk disubmit (contoh sederhana)
+        const file = files[0];
+        fileName = file.name;
+        
+        // Convert to base64
+        const toBase64 = (f) => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(f);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = error => reject(error);
+        });
+
+        fileData = await toBase64(file);
+      }
+
       await ticketService.createTicket({
         judul: form.subject,
         deskripsi: form.deskripsi,
         id_jenis_pengajuan: parseInt(form.id_jenis_pengajuan),
         id_dosen: parseInt(form.id_dosen),
-        tanggal_bimbingan: form.tanggal_bimbingan || null
+        tanggal_bimbingan: form.tanggal_bimbingan || null,
+        file_name: fileName,
+        file_data: fileData
       });
 
       setSuccess(true);
@@ -110,11 +130,10 @@ export default function BukaTiketBaru() {
     }
   }
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar role="mahasiswa" />
-      <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="min-h-screen bg-transparent">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Buat Tiket Baru</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Buat Tiket Baru</h1>
           <p className="text-gray-500 text-sm mt-1">Silahkan isi formulir ini untuk membuat sebuah tiket baru.</p>
         </div>
 
@@ -128,24 +147,24 @@ export default function BukaTiketBaru() {
         </div>
 
         {/* Form card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-          <div className="space-y-6">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-8">
+          <div className="space-y-5 sm:space-y-6">
             {/* Email */}
-            <div className="grid grid-cols-3 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 sm:items-center">
               <label className="text-sm font-semibold text-gray-700">Email</label>
-              <div className="col-span-2 text-sm text-gray-600">{user?.email}</div>
+              <div className="sm:col-span-2 text-sm text-gray-600">{user?.email}</div>
             </div>
 
             {/* Nama */}
-            <div className="grid grid-cols-3 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 sm:items-center">
               <label className="text-sm font-semibold text-gray-700">Nama</label>
-              <div className="col-span-2 text-sm text-gray-600">{user?.nama}</div>
+              <div className="sm:col-span-2 text-sm text-gray-600">{user?.nama}</div>
             </div>
 
             {/* Topik */}
-            <div className="grid grid-cols-3 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 sm:items-center">
               <label className="text-sm font-semibold text-gray-700">Topik Bantuan</label>
-              <div className="col-span-2 relative">
+              <div className="sm:col-span-2 relative">
                 <select
                   value={form.id_jenis_pengajuan}
                   onChange={(e) => {
@@ -153,7 +172,6 @@ export default function BukaTiketBaru() {
                     setForm((prev) => ({
                       ...prev,
                       id_jenis_pengajuan: nextTopik,
-                      // Kosongkan tanggal jika topik bukan Pengajuan Bimbingan
                       tanggal_bimbingan: Number(nextTopik) === 2 ? prev.tanggal_bimbingan : '',
                     }));
                   }}
@@ -169,9 +187,9 @@ export default function BukaTiketBaru() {
             </div>
 
             {/* Dosen */}
-            <div className="grid grid-cols-3 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 sm:items-center">
               <label className="text-sm font-semibold text-gray-700">Nama Dosen</label>
-              <div className="col-span-2 relative">
+              <div className="sm:col-span-2 relative">
                 <select
                   value={form.id_dosen}
                   onChange={(e) => setForm({ ...form, id_dosen: e.target.value })}
@@ -187,9 +205,9 @@ export default function BukaTiketBaru() {
             </div>
 
             {/* Subject */}
-            <div className="grid grid-cols-3 gap-4 items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 sm:items-center">
               <label className="text-sm font-semibold text-gray-700">Subject</label>
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <input
                   type="text"
                   value={form.subject}
@@ -200,11 +218,11 @@ export default function BukaTiketBaru() {
               </div>
             </div>
 
-            {/* Tanggal Bimbingan - hanya untuk Pengajuan Bimbingan */}
+            {/* Tanggal Bimbingan */}
             {isBimbinganTopic && (
-              <div className="grid grid-cols-3 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4 sm:items-center">
                 <label className="text-sm font-semibold text-gray-700">Tanggal Bimbingan</label>
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <input
                     type="date"
                     value={form.tanggal_bimbingan}
@@ -216,9 +234,9 @@ export default function BukaTiketBaru() {
             )}
 
             {/* Deskripsi */}
-            <div className="grid grid-cols-3 gap-4">
-              <label className="text-sm font-semibold text-gray-700 pt-3">Deskripsi</label>
-              <div className="col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4">
+              <label className="text-sm font-semibold text-gray-700 sm:pt-3">Deskripsi</label>
+              <div className="sm:col-span-2">
                 <textarea
                   value={form.deskripsi}
                   onChange={(e) => setForm({ ...form, deskripsi: e.target.value })}
@@ -229,11 +247,11 @@ export default function BukaTiketBaru() {
               </div>
             </div>
 
-            {/* File Upload - hanya untuk topik Surat */}
+            {/* File Upload */}
             {isSuratTopic && (
-              <div className="grid grid-cols-3 gap-4">
-                <label className="text-sm font-semibold text-gray-700 pt-3">File Pendukung</label>
-                <div className="col-span-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4">
+                <label className="text-sm font-semibold text-gray-700 sm:pt-3">File Pendukung</label>
+                <div className="sm:col-span-2">
                   <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-colors">
                     <input
                       type="file"
@@ -253,7 +271,6 @@ export default function BukaTiketBaru() {
                     </label>
                   </div>
                   
-                  {/* Daftar file yang sudah diupload */}
                   {files.length > 0 && (
                     <div className="mt-4 space-y-2">
                       <p className="text-xs font-semibold text-gray-600">File yang diupload:</p>
@@ -296,19 +313,19 @@ export default function BukaTiketBaru() {
             )}
 
             {/* Actions */}
-            <div className="flex justify-end gap-3 pt-2">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
+              <button
+                onClick={() => navigate('/tiket')}
+                className="px-6 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors w-full sm:w-auto"
+              >
+                Batal
+              </button>
               <button
                 onClick={handleSubmit}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors text-sm shadow-sm"
+                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors text-sm shadow-sm w-full sm:w-auto"
               >
                 <Plus size={16} />
                 Kirim
-              </button>
-              <button
-                onClick={() => navigate('/tiket')}
-                className="px-6 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Batal
               </button>
             </div>
           </div>

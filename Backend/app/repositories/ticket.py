@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, defer
 from sqlalchemy import func
 from app.models.ticket import Ticket
 from app.schemas.ticket import TicketCreate, TicketUpdateStatus 
@@ -13,6 +13,8 @@ class TicketRepository:
             topik=str(ticket_data.id_jenis_pengajuan),  # Map id_jenis_pengajuan to topik
             subjek=ticket_data.judul,  # Map judul to subjek
             deskripsi=ticket_data.deskripsi,
+            file_name=ticket_data.file_name,
+            file_data=ticket_data.file_data,
             tanggal_bimbingan=ticket_data.tanggal_bimbingan,  # Save tanggal if provided
             status="PENDING"  # Default status
         )
@@ -24,8 +26,12 @@ class TicketRepository:
     @staticmethod
     def get_tickets_by_user(db: Session, user_id: str, role: str):
         if role == "DOSEN":
-            return db.query(Ticket).filter(Ticket.dosen_id == user_id).order_by(Ticket.created_at.desc()).all()
-        return db.query(Ticket).filter(Ticket.mahasiswa_id == user_id).order_by(Ticket.created_at.desc()).all()
+            return db.query(Ticket).options(defer(Ticket.file_data)).filter(Ticket.dosen_id == user_id).order_by(Ticket.created_at.desc()).all()
+        return db.query(Ticket).options(defer(Ticket.file_data)).filter(Ticket.mahasiswa_id == user_id).order_by(Ticket.created_at.desc()).all()
+    
+    @staticmethod
+    def get_ticket_by_id(db: Session, ticket_id: int):
+        return db.query(Ticket).filter(Ticket.id == ticket_id).first()
     
     @staticmethod
     def get_dashboard_stats(db: Session, user_id: str, role: str):

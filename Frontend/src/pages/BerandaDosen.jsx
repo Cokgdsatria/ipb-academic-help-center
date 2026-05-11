@@ -1,6 +1,5 @@
 import { FileText, Clock, XCircle, FileCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
 import { useState, useEffect } from 'react';
 import { ticketService } from '../services/ticketService';
 
@@ -97,25 +96,24 @@ export default function BerandaDosen() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar role="dosen" />
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="min-h-screen bg-transparent">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Greeting */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
             Selamat datang di IPB Academic Help Center
           </h1>
-          <p className="text-xl font-semibold text-gray-700 mt-1">Halo, {user?.nama} 👋</p>
-          <p className="text-base font-bold text-gray-800 mt-4">Dashboard Dosen</p>
+          <p className="text-lg sm:text-xl font-semibold text-gray-700 mt-1">Halo, {user?.nama} 👋</p>
+          <p className="text-sm sm:text-base font-bold text-gray-800 mt-4">Dashboard Dosen</p>
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-3 gap-5 mb-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-4 sm:mb-5">
           {statItems.slice(0, 3).map((s) => (
             <StatCard key={s.label} {...s} />
           ))}
         </div>
-        <div className="grid grid-cols-2 gap-5 max-w-2xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 max-w-2xl">
           {statItems.slice(3).map((s) => (
             <StatCard key={s.label} {...s} />
           ))}
