@@ -30,9 +30,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* LEFT PANEL */}
-      <div className="w-1/2 relative flex flex-col justify-between p-10 overflow-hidden">
+    <div className="min-h-screen flex flex-col md:flex-row">
+      {/* LEFT PANEL - hidden on mobile */}
+      <div className="hidden md:flex md:w-1/2 relative flex-col justify-between p-10 overflow-hidden">
 
         {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700" />
@@ -45,7 +45,7 @@ export default function LoginPage() {
           }}
         />
 
-        {/* IMAGE BACKGROUND (INI YANG KAMU GANTI) */}
+        {/* IMAGE BACKGROUND */}
         <div
           className="absolute inset-0 bg-cover bg-center opacity-25"
           style={{
@@ -82,8 +82,17 @@ export default function LoginPage() {
       </div>
 
       {/* RIGHT PANEL */}
-      <div className="w-1/2 flex items-center justify-center bg-white px-16">
+      <div className="flex-1 md:w-1/2 flex items-center justify-center bg-white px-6 sm:px-10 md:px-16 py-12">
         <div className="w-full max-w-md">
+
+          {/* Mobile Logo (shown only on mobile) */}
+          <div className="flex md:hidden items-center gap-3 mb-8">
+            <IPBLogo size={40} />
+            <div>
+              <div className="text-blue-700 font-bold text-base">IPB Logicore</div>
+              <div className="text-gray-500 text-xs">Help Center</div>
+            </div>
+          </div>
 
           {/* HEADER */}
           <div className="mb-8">
@@ -151,12 +160,15 @@ export default function LoginPage() {
             {/* BUTTON */}
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-colors"
             >
               Masuk
             </button>
 
           </form>
+
+          {/* Mobile footer */}
+          <p className="md:hidden text-center text-xs text-gray-400 mt-8">© 2026 IPB University</p>
         </div>
       </div>
     </div>

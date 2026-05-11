@@ -107,7 +107,7 @@ export default function DetailTiket() {
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Back + Illustration */}
         <div className="flex items-start justify-between mb-4">
           <button
@@ -117,26 +117,26 @@ export default function DetailTiket() {
             <ArrowLeft size={16} />
             Kembali ke Daftar
           </button>
-          <img src="/gambar_detailtiket.png" alt="Illustration" className="w-44 h-36 object-contain" />
+          <img src="/gambar_detailtiket.png" alt="Illustration" className="hidden sm:block w-44 h-36 object-contain" />
         </div>
 
         {/* Ticket ID */}
         <p className="text-blue-600 font-bold text-lg mb-4">{uiTicket.idLabel}</p>
 
         {/* Main card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-5">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 mb-5">
           {/* Header */}
           <div className="flex items-start gap-4 mb-5 pb-5 border-b border-gray-100">
-            <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-              <FileText size={26} className="text-blue-600" />
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+              <FileText size={22} className="text-blue-600" />
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">{ticket.subjek}</h1>
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-lg font-bold text-gray-900">{ticket.subjek}</h1>
               <div className="flex items-center gap-2 mt-1 text-sm text-gray-400">
                 <Calendar size={14} />
                 <span>Dibuat pada: {uiTicket.createdAtLabel}</span>
               </div>
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex flex-wrap items-center gap-2 mt-2">
                 <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
                   {uiTicket.topikLabel}
                 </span>
@@ -148,13 +148,13 @@ export default function DetailTiket() {
           </div>
 
           {/* Description */}
-          <div className="bg-gray-50 rounded-xl p-5">
+          <div className="bg-gray-50 rounded-xl p-4 sm:p-5">
             <p className="text-sm text-gray-700 leading-relaxed">{ticket.deskripsi || '-'}</p>
           </div>
 
           {/* Attachment */}
           {ticket.file_name && ticket.file_data && (
-            <div className="mt-4 bg-gray-50 rounded-xl p-4 border border-gray-200 flex items-center justify-between">
+            <div className="mt-4 bg-gray-50 rounded-xl p-4 border border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-blue-600">
                   <FileText size={20} />
@@ -167,7 +167,7 @@ export default function DetailTiket() {
               <a
                 href={ticket.file_data}
                 download={ticket.file_name}
-                className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition"
+                className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition w-full sm:w-auto justify-center"
               >
                 <Download size={16} />
                 Unduh
@@ -184,9 +184,9 @@ export default function DetailTiket() {
           )}
         </div>
 
-        {/* Komentar dosen (sementara 1 komentar dari field komentar_dosen) */}
+        {/* Komentar dosen */}
         {uiTicket.komentar.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
             <h2 className="font-bold text-gray-900 mb-4">Komentar</h2>
             <div className="space-y-4">
               {uiTicket.komentar.map((k, i) => (
