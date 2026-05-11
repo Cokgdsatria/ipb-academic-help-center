@@ -46,32 +46,32 @@ export default function BerandaMahasiswa() {
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Greeting */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
             Selamat datang, {user?.nama} 👋
           </h1>
           <p className="text-gray-500 text-sm mt-1">Di IPB Logicore Help Center</p>
         </div>
 
         {/* Main section: card + status */}
-        <div className="grid grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
           {/* Info card */}
-          <div className="col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex items-center justify-between">
-            <div className="flex items-center gap-5">
-              <IPBLogo size={56} />
+          <div className="md:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-8 flex items-center justify-between overflow-hidden">
+            <div className="flex items-center gap-4 sm:gap-5">
+              <IPBLogo size={48} />
               <div>
-                <div className="text-xl font-bold text-gray-900">IPB Logicore</div>
+                <div className="text-lg sm:text-xl font-bold text-gray-900">IPB Logicore</div>
                 <p className="text-gray-500 text-sm mt-1">Layanan bantuan untuk Mahasiswa</p>
-                <p className="text-gray-500 text-sm mt-1">Departemen Ilmu Komputer</p>
+                <p className="text-gray-500 text-sm">Departemen Ilmu Komputer</p>
               </div>
             </div>
-            <img src="/beranda gambar.png" alt="Illustration" className="w-40 h-36 object-contain" />
+            <img src="/beranda gambar.png" alt="Illustration" className="hidden sm:block w-32 sm:w-40 h-28 sm:h-36 object-contain flex-shrink-0" />
           </div>
 
           {/* Status Tiket */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
             <h2 className="font-bold text-gray-900 mb-4">Status Tiket Saya</h2>
             <div className="space-y-3">
               {statusItems.map((item) => (
@@ -87,7 +87,7 @@ export default function BerandaMahasiswa() {
         </div>
 
         {/* Help banner */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center justify-between">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
               <Info size={20} className="text-white" />
@@ -99,7 +99,7 @@ export default function BerandaMahasiswa() {
           </div>
           <button
             onClick={() => navigate('/tiket/baru')}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-3 rounded-xl transition-colors text-sm whitespace-nowrap ml-6 shadow-sm"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-3 rounded-xl transition-colors text-sm whitespace-nowrap shadow-sm w-full sm:w-auto justify-center"
           >
             <Plus size={18} />
             Buka Tiket Baru

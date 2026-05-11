@@ -2,9 +2,9 @@ import { FileText, Calendar, User, Download, File } from 'lucide-react';
 
 export default function ModalDetailPengajuan({ ticket, onClose, onUpdateStatus }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4">
-        <div className="p-6">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/30 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-auto my-auto">
+        <div className="p-5 sm:p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-5">Detail Pengajuan</h2>
 
           {/* Ticket info */}
@@ -72,18 +72,18 @@ export default function ModalDetailPengajuan({ ticket, onClose, onUpdateStatus }
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={onUpdateStatus}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm"
-            >
-              Update Status
-            </button>
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3">
             <button
               onClick={onClose}
-              className="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors w-full sm:w-auto"
             >
               Tutup
+            </button>
+            <button
+              onClick={onUpdateStatus}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm w-full sm:w-auto"
+            >
+              Update Status
             </button>
           </div>
         </div>
