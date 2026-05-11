@@ -76,7 +76,8 @@ def get_my_dashboard_stats(
     db: Session = Depends(get_db),
     current_user: any = Depends(get_current_user)
 ):
-    return TicketRepository.get_dashboard_stats(db=db, user_id=current_user.id_user, role=current_user.role)
+    role = (current_user.role or "").upper()
+    return TicketRepository.get_dashboard_stats(db=db, user_id=current_user.id_user, role=role)
 
 # ENDPOINT: DAFTAR RIWAYAT TICKET
 @router.get("/my-tickets", response_model=List[TicketResponse])
@@ -84,10 +85,11 @@ def get_all_my_tickets(
     db: Session = Depends(get_db),
     current_user: any = Depends(get_current_user)
 ):
+    role = (current_user.role or "").upper()
     return TicketRepository.get_tickets_by_user(
         db=db,
         user_id=current_user.id_user,
-        role=current_user.role
+        role=role
     )
 
 # ENDPOINT: AMBIL DETAIL TICKET BESERTA FILE
@@ -97,12 +99,13 @@ def get_ticket_detail(
     db: Session = Depends(get_db),
     current_user: any = Depends(get_current_user)
 ):
+    role = (current_user.role or "").upper()
     ticket = TicketRepository.get_ticket_by_id(db=db, ticket_id=ticket_id)
     if not ticket:
         raise HTTPException(status_code=404, detail="Tiket tidak ditemukan")
-    if current_user.role == "DOSEN" and ticket.dosen_id != current_user.id_user:
+    if role == "DOSEN" and ticket.dosen_id != current_user.id_user:
         raise HTTPException(status_code=403, detail="Akses ditolak")
-    if current_user.role == "MAHASISWA" and ticket.mahasiswa_id != current_user.id_user:
+    if role == "MAHASISWA" and ticket.mahasiswa_id != current_user.id_user:
         raise HTTPException(status_code=403, detail="Akses ditolak")
     return ticket
 
@@ -114,7 +117,9 @@ def update_status(
     db: Session = Depends(get_db),
     current_user: any = Depends(get_current_user)
 ):
-    if current_user.role != "DOSEN":
+    role = (current_user.role or "").upper()
+
+    if role != "DOSEN":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Akses ditolak. Hanya dosen yang dapat memproses pengajuan"

@@ -1,9 +1,15 @@
 from sqlalchemy.orm import Session, defer
 from sqlalchemy import func
 from app.models.ticket import Ticket
+from app.models.user import User
 from app.schemas.ticket import TicketCreate, TicketUpdateStatus 
 
 class TicketRepository:
+    @staticmethod
+    def _attach_display_fields(db: Session, ticket: Ticket):
+        mahasiswa = db.query(User.id_user, User.nama).filter(User.id_user == ticket.mahasiswa_id).first()
+        ticket.mahasiswa_nama = mahasiswa.nama if mahasiswa else None
+        return ticket
 
     @staticmethod
     def create_ticket(db: Session, ticket_data: TicketCreate, mahasiswa_id: str):
@@ -25,17 +31,22 @@ class TicketRepository:
     
     @staticmethod
     def get_tickets_by_user(db: Session, user_id: str, role: str):
-        if role == "DOSEN":
-            return db.query(Ticket).options(defer(Ticket.file_data)).filter(Ticket.dosen_id == user_id).order_by(Ticket.created_at.desc()).all()
-        return db.query(Ticket).options(defer(Ticket.file_data)).filter(Ticket.mahasiswa_id == user_id).order_by(Ticket.created_at.desc()).all()
+        if (role or "").upper() == "DOSEN":
+            tickets = db.query(Ticket).options(defer(Ticket.file_data)).filter(Ticket.dosen_id == user_id).order_by(Ticket.created_at.desc()).all()
+        else:
+            tickets = db.query(Ticket).options(defer(Ticket.file_data)).filter(Ticket.mahasiswa_id == user_id).order_by(Ticket.created_at.desc()).all()
+        return [TicketRepository._attach_display_fields(db, ticket) for ticket in tickets]
     
     @staticmethod
     def get_ticket_by_id(db: Session, ticket_id: int):
-        return db.query(Ticket).filter(Ticket.id == ticket_id).first()
+        ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+        if not ticket:
+            return None
+        return TicketRepository._attach_display_fields(db, ticket)
     
     @staticmethod
     def get_dashboard_stats(db: Session, user_id: str, role: str):
-        if role == "DOSEN":
+        if (role or "").upper() == "DOSEN":
             base_query = db.query(Ticket).filter(Ticket.dosen_id == user_id)
         else:
             base_query = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id)
@@ -63,4 +74,6 @@ class TicketRepository:
             db_ticket.komentar_dosen = update_data.komentar_dosen
             db.commit()
             db.refresh(db_ticket)
-        return db_ticket
+        if not db_ticket:
+            return None
+        return TicketRepository._attach_display_fields(db, db_ticket)

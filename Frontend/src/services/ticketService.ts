@@ -28,6 +28,7 @@ export interface TicketResponse {
     subjek: string;
     status: 'PENDING' | 'RESOLVED' | 'REJECTED';
     deskripsi?: string;
+    mahasiswa_nama?: string;
     file_name?: string;
     dosen_id?: number;
     tanggal_bimbingan?: string;
@@ -44,6 +45,11 @@ export interface DashboardStats {
   pending_tickets: number;
   completed_tickets: number;
   rejected_tickets: number;
+}
+
+export interface TicketStatusUpdateRequest {
+  status: 'PENDING' | 'RESOLVED' | 'REJECTED';
+  komentar_dosen?: string | null;
 }
 
 const getAuthHeader = () => {
@@ -89,6 +95,15 @@ export const ticketService = {
   // 6. Ambil Detail Tiket Berdasarkan ID
   getTicketById: async (id: string | number): Promise<TicketDetailResponse> => {
     const response = await axios.get(`${API_URL}/tickets/${id}`, getAuthHeader());
+    return response.data;
+  },
+
+  // 7. Update status tiket oleh dosen
+  updateTicketStatus: async (
+    id: string | number,
+    data: TicketStatusUpdateRequest
+  ): Promise<TicketResponse> => {
+    const response = await axios.patch(`${API_URL}/tickets/${id}/status`, data, getAuthHeader());
     return response.data;
   }
 };

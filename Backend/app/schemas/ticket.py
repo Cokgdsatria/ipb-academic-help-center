@@ -19,6 +19,7 @@ class TicketResponse(BaseModel):
     status: str
 
     deskripsi: Optional[str] = None
+    mahasiswa_nama: Optional[str] = None
     file_name: Optional[str] = None
     dosen_id: Optional[int] = None
     tanggal_bimbingan: Optional[date] = None
