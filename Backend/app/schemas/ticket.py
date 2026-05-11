@@ -8,6 +8,8 @@ class TicketCreate(BaseModel):
     id_jenis_pengajuan: int
     id_dosen: int
     tanggal_bimbingan: Optional[date] = None  # Optional, hanya untuk bimbingan
+    file_name: Optional[str] = None
+    file_data: Optional[str] = None
 
 class TicketResponse(BaseModel):
     id: int
@@ -17,12 +19,16 @@ class TicketResponse(BaseModel):
     status: str
 
     deskripsi: Optional[str] = None
+    file_name: Optional[str] = None
     dosen_id: Optional[int] = None
     tanggal_bimbingan: Optional[date] = None
     komentar_dosen: Optional[str] = None
 
     class Config:
         from_attributes = True
+
+class TicketDetailResponse(TicketResponse):
+    file_data: Optional[str] = None
 
 class DashboardStats(BaseModel):
     total_tickets: int

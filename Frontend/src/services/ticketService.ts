@@ -18,6 +18,8 @@ export interface TicketRequest {
   id_jenis_pengajuan: number;
   id_dosen: number;
   tanggal_bimbingan?: string | null;
+  file_name?: string | null;
+  file_data?: string | null;
 }
 
 export interface TicketResponse {
@@ -26,10 +28,15 @@ export interface TicketResponse {
     subjek: string;
     status: 'PENDING' | 'RESOLVED' | 'REJECTED';
     deskripsi?: string;
+    file_name?: string;
     dosen_id?: number;
     tanggal_bimbingan?: string;
     komentar_dosen?: string;
     created_at: string;
+}
+
+export interface TicketDetailResponse extends TicketResponse {
+    file_data?: string;
 }
 
 export interface DashboardStats {
@@ -76,6 +83,12 @@ export const ticketService = {
   // 5. Ambil Daftar Riwayat Tiket Saya
   getMyTickets: async (): Promise<TicketResponse[]> => {
     const response = await axios.get(`${API_URL}/tickets/my-tickets`, getAuthHeader());
+    return response.data;
+  },
+
+  // 6. Ambil Detail Tiket Berdasarkan ID
+  getTicketById: async (id: string | number): Promise<TicketDetailResponse> => {
+    const response = await axios.get(`${API_URL}/tickets/${id}`, getAuthHeader());
     return response.data;
   }
 };

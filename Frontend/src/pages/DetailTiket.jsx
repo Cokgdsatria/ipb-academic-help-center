@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, FileText, User } from 'lucide-react';
+import { ArrowLeft, Calendar, FileText, User, Download } from 'lucide-react';
 import { ticketService } from '../services/ticketService';
 import { useAuth } from '../context/AuthContext';
 
@@ -45,9 +45,7 @@ export default function DetailTiket() {
       setLoading(true);
       setError('');
       try {
-        // Backend belum punya endpoint detail by id, jadi ambil daftar lalu cari id yang sesuai
-        const myTickets = await ticketService.getMyTickets();
-        const found = myTickets.find((t) => String(t.id) === String(id));
+        const found = await ticketService.getTicketById(id);
         if (!found) {
           setTicket(null);
           setError('Tiket tidak ditemukan atau Anda tidak punya akses.');
@@ -153,6 +151,29 @@ export default function DetailTiket() {
           <div className="bg-gray-50 rounded-xl p-5">
             <p className="text-sm text-gray-700 leading-relaxed">{ticket.deskripsi || '-'}</p>
           </div>
+
+          {/* Attachment */}
+          {ticket.file_name && ticket.file_data && (
+            <div className="mt-4 bg-gray-50 rounded-xl p-4 border border-gray-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-blue-600">
+                  <FileText size={20} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">{ticket.file_name}</p>
+                  <p className="text-xs text-gray-500">Lampiran Pengajuan</p>
+                </div>
+              </div>
+              <a
+                href={ticket.file_data}
+                download={ticket.file_name}
+                className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition"
+              >
+                <Download size={16} />
+                Unduh
+              </a>
+            </div>
+          )}
 
           {ticket.tanggal_bimbingan && (
             <div className="mt-4 bg-blue-50 rounded-xl p-4 border border-blue-100">
