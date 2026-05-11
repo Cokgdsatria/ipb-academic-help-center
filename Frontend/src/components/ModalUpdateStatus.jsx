@@ -2,15 +2,27 @@ import { useState } from 'react';
 import { X, ChevronDown } from 'lucide-react';
 
 export default function ModalUpdateStatus({ ticket, onClose, onSave }) {
-  const [status, setStatus] = useState('Selesai');
-  const [komentar, setKomentar] = useState('');
+  const statusMapToUi = {
+    PENDING: 'Menunggu',
+    RESOLVED: 'Selesai',
+    REJECTED: 'Ditolak',
+  };
+
+  const [status, setStatus] = useState(statusMapToUi[ticket?.status] || 'Selesai');
+  const [komentar, setKomentar] = useState(ticket?.komentar_dosen || '');
 
   const handleSave = () => {
-    onSave({ status, komentar });
+    const statusMapToApi = {
+      Menunggu: 'PENDING',
+      Selesai: 'RESOLVED',
+      Ditolak: 'REJECTED',
+    };
+
+    onSave({ status: statusMapToApi[status], komentar });
     onClose();
   };
 
-  const statusOptions = ['Selesai', 'Disetujui', 'Ditolak'];
+  const statusOptions = ['Menunggu', 'Selesai', 'Ditolak'];
 
   return (
     <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/30 backdrop-blur-sm p-4 overflow-y-auto">

@@ -1,6 +1,27 @@
 import { FileText, Calendar, User, Download, File } from 'lucide-react';
 
 export default function ModalDetailPengajuan({ ticket, onClose, onUpdateStatus }) {
+  const topikMap = {
+    '1': 'Pengajuan Surat',
+    '2': 'Pengajuan Bimbingan',
+    '3': 'Pengajuan Akademik',
+  };
+
+  const formatDateTime = (isoString) => {
+    if (!isoString) return '-';
+    try {
+      return new Date(isoString).toLocaleString('id-ID', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return '-';
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/30 backdrop-blur-sm p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-auto my-auto">
@@ -14,14 +35,19 @@ export default function ModalDetailPengajuan({ ticket, onClose, onUpdateStatus }
                 <FileText size={22} className="text-blue-600" />
               </div>
               <div>
-                <p className="font-bold text-gray-900">{ticket.subject}</p>
+                <p className="font-bold text-gray-900">{ticket.subjek}</p>
                 <div className="flex items-center gap-2 mt-1 text-sm text-gray-400">
                   <span>Diajukan oleh</span>
-                  <span className="text-blue-600 font-semibold text-xs">{ticket.mahasiswa}</span>
+                  <span className="text-blue-600 font-semibold text-xs">{ticket.mahasiswa_nama || `Mahasiswa #${ticket.mahasiswa_id || ''}`}</span>
                 </div>
                 <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-400">
                   <Calendar size={12} />
-                  <span>{ticket.tanggal}</span>
+                  <span>{formatDateTime(ticket.created_at)}</span>
+                </div>
+                <div className="mt-2">
+                  <span className="inline-flex px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold">
+                    {topikMap[String(ticket.topik)] || ticket.topik || '-'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -33,39 +59,40 @@ export default function ModalDetailPengajuan({ ticket, onClose, onUpdateStatus }
               </div>
             </div>
 
+            {ticket.tanggal_bimbingan && (
+              <div className="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-100">
+                <p className="text-sm text-blue-800">
+                  Tanggal Bimbingan: <span className="font-semibold">{ticket.tanggal_bimbingan}</span>
+                </p>
+              </div>
+            )}
+
             {/* Files Section */}
-            {ticket.files && ticket.files.length > 0 && (
+            {ticket.file_name && ticket.file_data && (
               <div className="mt-4 pt-3 border-t border-gray-100">
                 <p className="text-sm font-semibold text-gray-800 mb-2">File yang Disertakan</p>
                 <div className="space-y-2">
-                  {ticket.files.map((file, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between bg-gray-50 rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <File size={18} className="text-blue-600 flex-shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-gray-700 truncate">
-                            {file.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {file.size}
-                          </p>
-                        </div>
+                  <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <File size={18} className="text-blue-600 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-700 truncate">
+                          {ticket.file_name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Lampiran Pengajuan
+                        </p>
                       </div>
-                      <button
-                        onClick={() => {
-                          // Simulasi membuka file
-                          alert(`Membuka file: ${file.name}`);
-                        }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors flex-shrink-0 ml-2"
-                      >
-                        <Download size={14} />
-                        <span>Buka</span>
-                      </button>
                     </div>
-                  ))}
+                    <a
+                      href={ticket.file_data}
+                      download={ticket.file_name}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors flex-shrink-0 ml-2"
+                    >
+                      <Download size={14} />
+                      <span>Unduh</span>
+                    </a>
+                  </div>
                 </div>
               </div>
             )}
