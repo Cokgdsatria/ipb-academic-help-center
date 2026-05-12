@@ -168,42 +168,49 @@ export default function PengajuanDosen() {
             const colors = iconColors[ticket.statusLabel] || iconColors.Selesai;
             return (
               <div key={ticket.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div className={`w-12 h-12 sm:w-14 sm:h-14 ${colors.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                      <FileText size={22} className={colors.icon} />
+                <div className="flex items-start justify-between gap-4">
+                  {/* Left: icon + info */}
+                  <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 ${colors.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                      <FileText size={20} className={colors.icon} />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <h3 className="font-bold text-gray-900 text-sm sm:text-base">{ticket.subject}</h3>
-                        <span className="hidden sm:inline-flex px-2 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-700">
-                          {ticket.topikLabel}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                    <div className="min-w-0">
+                      {/* Subject — max 2 lines, ellipsis */}
+                      <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-snug line-clamp-2 mb-1">
+                        {ticket.subject}
+                      </h3>
+                      {/* Topik badge */}
+                      <span className="inline-flex px-2 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 mb-2">
+                        {ticket.topikLabel}
+                      </span>
+                      {/* Pengaju */}
+                      <div className="flex items-center gap-2 text-sm text-gray-500 mb-1.5">
                         <span>Diajukan oleh</span>
                         <span className={`px-2 py-0.5 rounded-md text-xs font-semibold ${colors.bg} ${colors.icon}`}>
                           {ticket.mahasiswa}
                         </span>
                       </div>
+                      {/* Tanggal */}
                       <div className="flex items-center gap-1.5 text-xs text-gray-400">
                         <Calendar size={13} />
                         <span>{ticket.tanggal}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 sm:gap-3 pl-0 sm:pl-0">
+
+                  {/* Right: badge status + buttons — always fixed width, never pushed */}
+                  <div className="flex flex-col items-end gap-2 flex-shrink-0">
                     <Badge status={ticket.statusLabel} />
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleOpenDetail(ticket)}
-                        className="px-3 sm:px-4 py-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="px-3 sm:px-4 py-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"
                       >
                         Lihat Detail
                       </button>
                       <button
                         onClick={() => setModalUpdate(ticket)}
-                        className="px-3 sm:px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors"
+                        className="px-3 sm:px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors whitespace-nowrap"
                       >
                         Update Status
                       </button>
