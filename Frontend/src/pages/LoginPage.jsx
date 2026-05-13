@@ -18,11 +18,10 @@ export default function LoginPage() {
 
     const result = await login(email, password);
     if (result.success) {
-      // navigate(result.role === 'dosen' ? '/dosen/beranda' : '/beranda');
       if (result.role === 'DOSEN') {
-        navigate('/beranda-dosen');
+        navigate('/dosen/beranda');
       } else {
-        navigate('/beranda-mahasiswa');
+        navigate('/beranda');
       }
     } else {
       setError('Email atau password salah. Pastikan data sudah sesuai di database.');
