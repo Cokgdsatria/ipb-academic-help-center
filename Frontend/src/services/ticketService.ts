@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:8000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1';
+
+const api = axios.create({
+  baseURL: API_URL,
+  timeout: 15000,
+});
 
 export interface JenisPengajuan {
     id: number;
@@ -56,7 +61,7 @@ const getAuthHeader = () => {
     const token = localStorage.getItem('token'); // Ambil token dari login
   return {
     headers: {
-      Authorization: `Bearer ${token}`,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   };
 };
@@ -64,37 +69,37 @@ const getAuthHeader = () => {
 export const ticketService = {
   // 1. Ambil Kategori Pengajuan 
   getTicketTypes: async (): Promise<JenisPengajuan[]> => {
-    const response = await axios.get(`${API_URL}/tickets/types`, getAuthHeader());
+    const response = await api.get(`/tickets/types`, getAuthHeader());
     return response.data;
   },
 
   // 2. Ambil Daftar Dosen 
   getLecturers: async (): Promise<Dosen[]> => {
-    const response = await axios.get(`${API_URL}/tickets/lecturers`, getAuthHeader());
+    const response = await api.get(`/tickets/lecturers`, getAuthHeader());
     return response.data;
   },
 
   // 3. Kirim Pengajuan Baru 
   createTicket: async (data: TicketRequest): Promise<TicketResponse> => {
-    const response = await axios.post(`${API_URL}/tickets/`, data, getAuthHeader());
+    const response = await api.post(`/tickets/`, data, getAuthHeader());
     return response.data;
   },
 
   // 4. Ambil Statistik Dashboard 
   getStats: async (): Promise<DashboardStats> => {
-    const response = await axios.get(`${API_URL}/tickets/stats`, getAuthHeader());
+    const response = await api.get(`/tickets/stats`, getAuthHeader());
     return response.data;
   },
 
   // 5. Ambil Daftar Riwayat Tiket Saya
   getMyTickets: async (): Promise<TicketResponse[]> => {
-    const response = await axios.get(`${API_URL}/tickets/my-tickets`, getAuthHeader());
+    const response = await api.get(`/tickets/my-tickets`, getAuthHeader());
     return response.data;
   },
 
   // 6. Ambil Detail Tiket Berdasarkan ID
   getTicketById: async (id: string | number): Promise<TicketDetailResponse> => {
-    const response = await axios.get(`${API_URL}/tickets/${id}`, getAuthHeader());
+    const response = await api.get(`/tickets/${id}`, getAuthHeader());
     return response.data;
   },
 
@@ -103,7 +108,7 @@ export const ticketService = {
     id: string | number,
     data: TicketStatusUpdateRequest
   ): Promise<TicketResponse> => {
-    const response = await axios.patch(`${API_URL}/tickets/${id}/status`, data, getAuthHeader());
+    const response = await api.patch(`/tickets/${id}/status`, data, getAuthHeader());
     return response.data;
   }
 };
