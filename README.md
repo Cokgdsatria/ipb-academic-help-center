@@ -312,4 +312,4 @@ VITE_API_URL=http://127.0.0.1:8000/api/v1
 
 ---
 
-> © 2026 IPB University — Sekolah Sains Data, Matematika, dan Informatika — Ilmu Komputer
+> © 2026 IPB University — Sekolah Sains Data, Matematika, dan Informatika — Departemen Ilmu Komputer

@@ -12,8 +12,13 @@ SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Membuat engine koneksi
 # Jika menggunakan database lokal, tidak perlu parameter tambahan. 
-# Untuk Supabase, konfigurasi standar ini sudah cukup.
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+# Untuk Supabase, konfigurasi standar ini sudah cukup, namun menambahkan pool_pre_ping membantu.
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    pool_pre_ping=True, # Mengecek apakah koneksi masih hidup sebelum digunakan
+    pool_size=10,       # Jumlah koneksi yang dipertahankan dalam pool
+    max_overflow=20     # Tambahan koneksi maksimal jika pool penuh
+)
 
 # Membuat sesi database
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

@@ -35,7 +35,18 @@ class TicketRepository:
             tickets = db.query(Ticket).options(defer(Ticket.file_data)).filter(Ticket.dosen_id == user_id).order_by(Ticket.created_at.desc()).all()
         else:
             tickets = db.query(Ticket).options(defer(Ticket.file_data)).filter(Ticket.mahasiswa_id == user_id).order_by(Ticket.created_at.desc()).all()
-        return [TicketRepository._attach_display_fields(db, ticket) for ticket in tickets]
+            
+        mahasiswa_ids = list(set([t.mahasiswa_id for t in tickets]))
+        if mahasiswa_ids:
+            users = db.query(User.id_user, User.nama).filter(User.id_user.in_(mahasiswa_ids)).all()
+            user_map = {u.id_user: u.nama for u in users}
+            for t in tickets:
+                t.mahasiswa_nama = user_map.get(t.mahasiswa_id)
+        else:
+            for t in tickets:
+                t.mahasiswa_nama = None
+                
+        return tickets
     
     @staticmethod
     def get_ticket_by_id(db: Session, ticket_id: int):
@@ -46,21 +57,25 @@ class TicketRepository:
     
     @staticmethod
     def get_dashboard_stats(db: Session, user_id: str, role: str):
+        from sqlalchemy import case
+        
         if (role or "").upper() == "DOSEN":
-            base_query = db.query(Ticket).filter(Ticket.dosen_id == user_id)
+            condition = Ticket.dosen_id == user_id
         else:
-            base_query = db.query(Ticket).filter(Ticket.mahasiswa_id == user_id)
+            condition = Ticket.mahasiswa_id == user_id
 
-        total = base_query.count()
-        pending = base_query.filter(Ticket.status == "PENDING").count()
-        completed = base_query.filter(Ticket.status == "RESOLVED").count()
-        rejected = base_query.filter(Ticket.status == "REJECTED").count()
+        stats = db.query(
+            func.count(Ticket.id).label('total'),
+            func.sum(case((Ticket.status == "PENDING", 1), else_=0)).label('pending'),
+            func.sum(case((Ticket.status == "RESOLVED", 1), else_=0)).label('completed'),
+            func.sum(case((Ticket.status == "REJECTED", 1), else_=0)).label('rejected')
+        ).filter(condition).first()
 
         return {
-            "total_tickets": total,
-            "pending_tickets": pending,
-            "completed_tickets": completed,
-            "rejected_tickets": rejected
+            "total_tickets": int(stats.total or 0),
+            "pending_tickets": int(stats.pending or 0),
+            "completed_tickets": int(stats.completed or 0),
+            "rejected_tickets": int(stats.rejected or 0)
         }
     
     @staticmethod
