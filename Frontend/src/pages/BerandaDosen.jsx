@@ -101,7 +101,7 @@ export default function BerandaDosen() {
         {/* Greeting */}
         <div className="mb-8">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-            Selamat datang di IPB Academic Help Center
+            Selamat datang di IPB Logicore Help Center
           </h1>
           <p className="text-lg sm:text-xl font-semibold text-gray-700 mt-1">Halo, {user?.nama} 👋</p>
           <p className="text-sm sm:text-base font-bold text-gray-800 mt-4">Dashboard Dosen</p>
